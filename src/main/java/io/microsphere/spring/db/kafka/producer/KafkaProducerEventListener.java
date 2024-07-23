@@ -56,7 +56,7 @@ public class KafkaProducerEventListener implements SmartApplicationListener, App
     private void sendRedisReplicatorKafkaMessage(String domain, DbDataExecuteUpdateEvent event) {
         String topic = createTopic(domain);
         // Almost all RedisCommands interface methods take the first argument as Key
-        String key = event.getTableName();
+        String key = event.getMessageKey();
         String value = JSONObject.toJSONString(event);
         // Use a timestamp of the event
         long timestamp = event.getTimestamp();
