@@ -34,7 +34,7 @@ public class StatementWrapper implements Statement {
      */
     @Override
     public int executeUpdate(String sql) throws SQLException {
-        StatementContext statementContext = new StatementContext(sql, 1);
+        StatementContext statementContext = new StatementContext(sql);
         statement.executeUpdate(sql);
         listeners.executeUpdate(statementContext);
         return 0;
@@ -110,7 +110,7 @@ public class StatementWrapper implements Statement {
 
     @Override
     public boolean execute(String sql) throws SQLException {
-        StatementContext statementContext = new StatementContext(sql, 1);
+        StatementContext statementContext = new StatementContext(sql);
         boolean execute = statement.execute(sql);
         listeners.executeUpdate(statementContext);
         return execute;

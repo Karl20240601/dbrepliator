@@ -19,7 +19,7 @@ public class DataSourceWrapperBeanPostProcessor implements BeanPostProcessor, Ap
     private ConfigurableApplicationContext configurableApplicationContext;
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.configurableApplicationContext = configurableApplicationContext;
+        this.configurableApplicationContext = (ConfigurableApplicationContext)applicationContext;
     }
 
     @Override
@@ -32,7 +32,7 @@ public class DataSourceWrapperBeanPostProcessor implements BeanPostProcessor, Ap
         DBReplicatorConfiguration dbReplicatorConfiguration = configurableApplicationContext.getBean(DBReplicatorConfiguration.class);
         Set<String> syncEnableDataSources = dbReplicatorConfiguration.getSyncEnableDataSources();
         if((CollectionUtils.isEmpty(syncEnableDataSources)||syncEnableDataSources.contains(beanName))&& DataSource.class.isAssignableFrom(bean.getClass())){
-            new DataSourceWrapper((DataSource)bean,dbReplicatorConfiguration);
+            return new DataSourceWrapper((DataSource)bean,dbReplicatorConfiguration);
         }
         return bean;
     }

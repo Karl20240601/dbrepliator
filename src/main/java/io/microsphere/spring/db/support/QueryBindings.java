@@ -24,7 +24,7 @@ public class QueryBindings {
 
 
     public void setBindValue(int arrayIndex, SQLType sqlType, Object value) {
-        sqlParameters[arrayIndex] = new SqlParameter(value, sqlType, value == null ? null : value.getClass());
+        sqlParameters[arrayIndex-1] = new SqlParameter(value, sqlType, value == null ? null : value.getClass());
     }
 
     public SqlParameter[] cloneBindValue() {
