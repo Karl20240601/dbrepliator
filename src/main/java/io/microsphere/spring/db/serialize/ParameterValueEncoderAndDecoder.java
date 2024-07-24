@@ -6,7 +6,7 @@ import org.springframework.lang.Nullable;
 public interface ParameterValueEncoderAndDecoder<T> {
     T getObject(byte[] bytes);
 
-    T getObject(String String);
+    T getObject(String string);
 
     byte[] getBytes(T t);
 

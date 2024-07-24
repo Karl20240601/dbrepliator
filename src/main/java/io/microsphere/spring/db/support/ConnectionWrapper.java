@@ -50,7 +50,6 @@ public class ConnectionWrapper implements Connection {
     @Override
     public void setAutoCommit(boolean autoCommit) throws SQLException {
         delegate.setAutoCommit(autoCommit);
-        ContextUtils.setAutoCommit(autoCommit);
     }
 
     @Override
@@ -61,7 +60,8 @@ public class ConnectionWrapper implements Connection {
     @Override
     public void commit() throws SQLException {
         delegate.commit();
-        PreparedStatementContext preparedStatementContext = ContextUtils.getPreparedStatementContext();
+        PreparedStatementContext preparedStatementContext = ContextUtils.getPreparedStatementContext(this);
+        preparedStatementContext.setAutoCommit(this.getAutoCommit());
         dbReplicatorConfiguration.getPreparedStatementEventListener().onCommit(preparedStatementContext);
     }
 
