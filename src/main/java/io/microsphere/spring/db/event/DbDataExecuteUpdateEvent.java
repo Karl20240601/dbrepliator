@@ -16,7 +16,7 @@ public class DbDataExecuteUpdateEvent extends ApplicationEvent {
     public DbDataExecuteUpdateEvent(Object source) {
         super(source);
         PreparedStatementContext preparedStatementContext = (PreparedStatementContext) source;
-        this.eventType = preparedStatementContext.getMenthodIndex();
+        this.eventType = 0;
         this.sql = preparedStatementContext.getSql();
         this.messageKey = SqlStringUtils.findTableNameBysql(sql);
         this.parameters = preparedStatementContext.getSqlParameter();

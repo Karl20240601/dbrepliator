@@ -11,6 +11,7 @@ public class PreparedStatementEventListenerImpl implements PreparedStatementEven
 
     private static final Logger logger = LoggerFactory.getLogger(PreparedStatementEventListenerImpl.class);
     private ApplicationEventPublisher applicationEventPublisher;
+
     @Override
     public void onPreparedExecuteUpdate(PreparedStatementContext statementContext) {
 
@@ -27,22 +28,17 @@ public class PreparedStatementEventListenerImpl implements PreparedStatementEven
     }
 
     @Override
-    public void onexecuteBatch(StatementContext StatementContext) {
+    public void onExecuteUpdate(StatementContext statementContext) {
 
     }
 
     @Override
-    public void onRollback(StatementContext StatementContext) {
+    public void onConnectionCommit(ConnectionContext statementContext) {
 
     }
 
     @Override
-    public void executeUpdate(StatementContext StatementContext) {
-
-    }
-
-    @Override
-    public void onCommit(StatementContext statementContext) {
+    public void onTransactionCommit(ConnectionContext statementContext) {
 
     }
 }

@@ -1,5 +1,6 @@
 package io.microsphere.spring.db.support;
 
+import io.microsphere.spring.db.event.ContextHodler;
 import io.microsphere.spring.db.event.PreparedStatementContext;
 import io.microsphere.spring.db.event.PreparedStatementEventListener;
 
@@ -24,7 +25,7 @@ public class PreparedStatementWrapper extends StatementWrapper implements Prepar
         this.statementContext = new PreparedStatementContext(sql);
         this.listeners = listeners;
         this.sql = sql;
-        ContextUtils.setPreparedStatementContext(connectionWrapper, this.statementContext);
+        ContextHodler.addPreparedStatement(connectionWrapper, this.statementContext);
     }
 
     @Override
@@ -45,10 +46,16 @@ public class PreparedStatementWrapper extends StatementWrapper implements Prepar
 
     private void publishEvent() {
         try {
-            statementContext.setAutoCommit(this.connectionWrapper.getAutoCommit());
-            listeners.onPreparedExecuteUpdate(statementContext);
-        } catch (Exception e) {
+            /**
+             * 自动提交时触发事件
+             */
+            if (this.connectionWrapper.getAutoCommit()) {
+                statementContext.setAutoCommit(this.connectionWrapper.getAutoCommit());
+                listeners.onPreparedExecuteUpdate(statementContext);
+            }
 
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -179,6 +186,11 @@ public class PreparedStatementWrapper extends StatementWrapper implements Prepar
         statementContext.setObject(parameterIndex, x);
     }
 
+    /**
+     * statement.execute 返回值如果是true,则是查询语句，否则是增删改语句
+     * @return
+     * @throws SQLException
+     */
     @Override
     public boolean execute() throws SQLException {
         boolean execute = this.statement.execute();
@@ -361,7 +373,9 @@ public class PreparedStatementWrapper extends StatementWrapper implements Prepar
 
     @Override
     public int[] executeBatch() throws SQLException {
-        return statement.executeBatch();
+        int[] ints = statement.executeBatch();
+        publishEvent();
+        return ints;
     }
 
     @Override

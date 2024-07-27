@@ -1,13 +1,8 @@
 package io.microsphere.spring.db.support;
 
 import io.microsphere.spring.db.config.DBReplicatorConfiguration;
-import io.microsphere.spring.db.event.PreparedStatementContext;
-import io.microsphere.spring.db.event.PreparedStatementEventListener;
-import io.microsphere.spring.db.event.PreparedStatementEventListenerImpl;
-import io.microsphere.spring.db.event.StatementEventListener;
-import org.springframework.context.ApplicationContext;
+import io.microsphere.spring.db.event.*;
 
-import javax.sql.DataSource;
 import java.sql.*;
 import java.util.Map;
 import java.util.Properties;
@@ -16,6 +11,7 @@ import java.util.concurrent.Executor;
 public class ConnectionWrapper implements Connection {
     private Connection delegate;
     private DBReplicatorConfiguration dbReplicatorConfiguration;
+    private final String sourceBeanName = null;
 
     public ConnectionWrapper(Connection delegate, DBReplicatorConfiguration dbReplicatorConfiguration) {
         this.delegate = delegate;
@@ -60,9 +56,8 @@ public class ConnectionWrapper implements Connection {
     @Override
     public void commit() throws SQLException {
         delegate.commit();
-        PreparedStatementContext preparedStatementContext = ContextUtils.getPreparedStatementContext(this);
-        preparedStatementContext.setAutoCommit(this.getAutoCommit());
-        dbReplicatorConfiguration.getPreparedStatementEventListener().onCommit(preparedStatementContext);
+        ConnectionContext connectionContext = ContextHodler.getConnectionContext(this);
+        dbReplicatorConfiguration.getPreparedStatementEventListener().onConnectionCommit(connectionContext);
     }
 
     @Override
@@ -73,7 +68,7 @@ public class ConnectionWrapper implements Connection {
     @Override
     public void close() throws SQLException {
         delegate.close();
-        ContextUtils.clearContext();
+        ContextHodler.clear(this);
 
     }
 

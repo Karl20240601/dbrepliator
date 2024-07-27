@@ -3,6 +3,7 @@ package io.microsphere.spring.db.event;
 import java.util.EventListener;
 
 public interface StatementEventListener extends EventListener {
-     void  executeUpdate(StatementContext statementContext);
-     void  onCommit(StatementContext statementContext);
+     void  onExecuteUpdate(StatementContext statementContext);
+     void  onConnectionCommit(ConnectionContext statementContext);
+     void  onTransactionCommit(ConnectionContext statementContext);
 }

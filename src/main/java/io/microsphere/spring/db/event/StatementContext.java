@@ -1,27 +1,40 @@
 package io.microsphere.spring.db.event;
 
 public class StatementContext {
-    private  String sql;
-    private int menthodIndex;
+    private StringBuilder stringBuilder = new StringBuilder();
+    private int sqlNum;
+
     public StatementContext() {
 
     }
 
     public StatementContext(String sql) {
-        this.sql = sql;
-        this.menthodIndex = menthodIndex;
+        appendSql(sql);
     }
 
+    public void addSql(String sql) {
+        appendSql(sql);
+    }
+
+    private void appendSql(String sql) {
+        if (sqlNum == 0) {
+            appendSql(sql);
+        }
+        appendSql(";");
+        appendSql(sql);
+        increSqlNum();
+    }
+
+    private void increSqlNum() {
+        sqlNum++;
+    }
+
+
+    public boolean isBatchUpdate() {
+        return this.sqlNum > 1;
+    }
 
     public String getSql() {
-        return sql;
-    }
-
-    public int getMenthodIndex() {
-        return menthodIndex;
-    }
-
-    public void setMenthodIndex(int menthodIndex) {
-        this.menthodIndex = menthodIndex;
+        return stringBuilder.length() <= 0 ? null : stringBuilder.toString();
     }
 }

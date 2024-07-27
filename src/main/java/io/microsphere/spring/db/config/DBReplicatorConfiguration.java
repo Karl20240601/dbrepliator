@@ -15,7 +15,7 @@ import java.util.Set;
 public class DBReplicatorConfiguration implements ApplicationContextAware, EnvironmentAware {
     private ConfigurableApplicationContext applicationContext;
     private Environment environment;
-
+    private  boolean dbReplicatorEnable;
     public String keyPrefix() {
         return "";
     }
@@ -42,10 +42,15 @@ public class DBReplicatorConfiguration implements ApplicationContextAware, Envir
     @Override
     public void setEnvironment(Environment environment) {
         this.environment = environment;
+        this.dbReplicatorEnable = environment.getProperty("",boolean.class,false);
     }
     
     public Set<String> getSyncEnableDataSources(){
         Set<String> property = (Set<String>) this.environment.getProperty("", List.class);
         return property;
-    } 
+    }
+
+    public boolean isDbReplicatorEnable(){
+        return this.dbReplicatorEnable;
+    }
 }
