@@ -1,9 +1,7 @@
 package io.microsphere.spring.db.beans;
 
 import io.microsphere.spring.db.config.DBReplicatorConfiguration;
-import io.microsphere.spring.db.event.PreparedStatementEventListenerImpl;
 import io.microsphere.spring.db.support.ConnectionWrapper;
-import org.springframework.context.ApplicationContext;
 
 import javax.sql.DataSource;
 import java.io.PrintWriter;

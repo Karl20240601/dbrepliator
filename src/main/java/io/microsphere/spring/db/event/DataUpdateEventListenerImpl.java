@@ -6,10 +6,10 @@ import org.springframework.context.ApplicationEventPublisher;
 
 import java.sql.SQLException;
 
-public class PreparedStatementEventListenerImpl implements PreparedStatementEventListener {
+public class DataUpdateEventListenerImpl implements DataUpdateEventListener {
     public static final String BEAN_NAME = "preparedStatementEventListenerImpl";
 
-    private static final Logger logger = LoggerFactory.getLogger(PreparedStatementEventListenerImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(DataUpdateEventListenerImpl.class);
     private ApplicationEventPublisher applicationEventPublisher;
 
     @Override

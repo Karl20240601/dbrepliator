@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * 生命周期：我觉的他应该在获取连接的时候就应存在，关闭的时候结束
  */
-class SqlExecuteContext {
+class TransactionContext {
     private Map<ConnectionWrapper, ConnectionContext> satementContextMap = new HashMap<>();
 
     public ConnectionContext getConnectionContext(ConnectionWrapper connection) {

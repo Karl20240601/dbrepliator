@@ -2,7 +2,7 @@ package io.microsphere.spring.db.support;
 
 import io.microsphere.spring.db.event.ContextHodler;
 import io.microsphere.spring.db.event.PreparedStatementContext;
-import io.microsphere.spring.db.event.PreparedStatementEventListener;
+import io.microsphere.spring.db.event.PreparedDataUpdateEventListener;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -15,10 +15,10 @@ public class PreparedStatementWrapper extends StatementWrapper implements Prepar
     private final PreparedStatement statement;
     private final ConnectionWrapper connectionWrapper;
     private final PreparedStatementContext statementContext;
-    private final PreparedStatementEventListener listeners;
+    private final PreparedDataUpdateEventListener listeners;
     private final String sql;
 
-    public PreparedStatementWrapper(PreparedStatement statement, String sql, ConnectionWrapper connectionWrapper, PreparedStatementEventListener listeners) {
+    public PreparedStatementWrapper(PreparedStatement statement, String sql, ConnectionWrapper connectionWrapper, PreparedDataUpdateEventListener listeners) {
         super(statement, connectionWrapper, listeners);
         this.statement = statement;
         this.connectionWrapper = connectionWrapper;

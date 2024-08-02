@@ -1,19 +1,17 @@
 package io.microsphere.spring.db.support;
 
 import io.microsphere.spring.db.event.StatementContext;
-import io.microsphere.spring.db.event.StatementEventListener;
+import io.microsphere.spring.db.event.DataUpdateEventListener;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class StatementWrapper implements Statement {
     private Statement statement;
     private ConnectionWrapper connectionWrapper;
     private StatementContext statementContext;
-    private StatementEventListener listeners;
+    private DataUpdateEventListener listeners;
 
-    public StatementWrapper(Statement statement, ConnectionWrapper connectionWrapper, StatementEventListener listeners) {
+    public StatementWrapper(Statement statement, ConnectionWrapper connectionWrapper, DataUpdateEventListener listeners) {
         this.statement = statement;
         this.connectionWrapper = connectionWrapper;
         this.statementContext = new StatementContext();

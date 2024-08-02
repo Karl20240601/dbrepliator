@@ -3,29 +3,27 @@ package io.microsphere.spring.db.event;
 
 import io.microsphere.spring.db.support.ConnectionWrapper;
 
-import java.sql.PreparedStatement;
-
 
 public class ContextHodler {
-    private static final ThreadLocal<SqlExecuteContext> SQLEXECUTECONTEXT_HODLER = new ThreadLocal<>();
+    private static final ThreadLocal<TransactionContext> SQLEXECUTECONTEXT_HODLER = new ThreadLocal<>();
 
     public static void addSqlExecuteContext(ConnectionWrapper connection, ConnectionContext connectionContext) {
-        SqlExecuteContext sqlExecuteContext = SQLEXECUTECONTEXT_HODLER.get();
-        if (sqlExecuteContext == null) {
+        TransactionContext transactionContext = SQLEXECUTECONTEXT_HODLER.get();
+        if (transactionContext == null) {
             throw new RuntimeException("");
         }
-        sqlExecuteContext.addConnectionContext(connection, connectionContext);
+        transactionContext.addConnectionContext(connection, connectionContext);
     }
 
     public static void addPreparedStatement(ConnectionWrapper connection, PreparedStatementContext preparedStatementContext) {
-        SqlExecuteContext sqlExecuteContext = SQLEXECUTECONTEXT_HODLER.get();
-        if (sqlExecuteContext == null) {
+        TransactionContext transactionContext = SQLEXECUTECONTEXT_HODLER.get();
+        if (transactionContext == null) {
             throw new RuntimeException("");
         }
-        sqlExecuteContext.getConnectionContext(connection).addStatementContexts(preparedStatementContext);
+        transactionContext.getConnectionContext(connection).addStatementContexts(preparedStatementContext);
     }
 
-    public static SqlExecuteContext getSqlExecuteContext() {
+    public static TransactionContext getSqlExecuteContext() {
         return SQLEXECUTECONTEXT_HODLER.get();
     }
 

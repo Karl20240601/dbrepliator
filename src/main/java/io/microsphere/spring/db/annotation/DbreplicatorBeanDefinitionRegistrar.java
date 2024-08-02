@@ -1,6 +1,6 @@
 package io.microsphere.spring.db.annotation;
 
-import io.microsphere.spring.db.event.PreparedStatementEventListenerImpl;
+import io.microsphere.spring.db.event.DataUpdateEventListenerImpl;
 import io.microsphere.spring.db.spring.DataSourceWrapperBeanPostProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +17,7 @@ public class DbreplicatorBeanDefinitionRegistrar implements ImportBeanDefinition
     @Override
     public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
         registerBeanDefinition(registry, DataSourceWrapperBeanPostProcessor.BEAN_NAME, DataSourceWrapperBeanPostProcessor.class);
-        registerBeanDefinition(registry, PreparedStatementEventListenerImpl.BEAN_NAME, PreparedStatementEventListenerImpl.class);
+        registerBeanDefinition(registry, DataUpdateEventListenerImpl.BEAN_NAME, DataUpdateEventListenerImpl.class);
 
     }
 

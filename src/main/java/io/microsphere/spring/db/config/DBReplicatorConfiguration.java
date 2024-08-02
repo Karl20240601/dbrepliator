@@ -1,6 +1,6 @@
 package io.microsphere.spring.db.config;
 
-import io.microsphere.spring.db.event.PreparedStatementEventListener;
+import io.microsphere.spring.db.event.DataUpdateEventListener;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -30,8 +30,8 @@ public class DBReplicatorConfiguration implements ApplicationContextAware, Envir
         return arrayList;
     }
 
-    public PreparedStatementEventListener getPreparedStatementEventListener() {
-        return applicationContext.getBean(PreparedStatementEventListener.class);
+    public DataUpdateEventListener getPreparedStatementEventListener() {
+        return applicationContext.getBean(DataUpdateEventListener.class);
     }
 
     @Override
