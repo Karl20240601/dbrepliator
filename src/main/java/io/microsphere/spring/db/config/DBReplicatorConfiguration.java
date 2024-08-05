@@ -1,6 +1,8 @@
 package io.microsphere.spring.db.config;
 
 import io.microsphere.spring.db.event.DataUpdateEventListener;
+import io.microsphere.spring.db.serialize.api.Serialization;
+import io.microsphere.spring.db.serialize.hessian2.Hessian2Serialization;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -52,5 +54,9 @@ public class DBReplicatorConfiguration implements ApplicationContextAware, Envir
 
     public boolean isDbReplicatorEnable(){
         return this.dbReplicatorEnable;
+    }
+
+    public Serialization getSerialization(){
+        return new Hessian2Serialization();
     }
 }

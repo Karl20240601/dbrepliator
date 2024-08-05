@@ -1,5 +1,6 @@
 package io.microsphere.spring.db.event;
 
+import io.microsphere.spring.db.support.enums.StatementEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -14,22 +15,16 @@ public class DataUpdateEventListenerImpl implements DataUpdateEventListener {
 
     @Override
     public void onPreparedExecuteUpdate(PreparedStatementContext statementContext) {
-
-        DbDataExecuteUpdateEvent dbDataExecuteUpdateEvent = new DbDataExecuteUpdateEvent(statementContext);
-        try {
-            if (statementContext.isAutoCommit()) {
-                applicationEventPublisher.publishEvent(dbDataExecuteUpdateEvent);
-            }
-
-        } catch (SQLException sqlException) {
-            logger.error("链接可能被关闭", sqlException);
-        }
-
+        DbDataExecuteUpdateEvent dbDataExecuteUpdateEvent = DbDataExecuteUpdateEventFactory.createDbDataExecuteUpdateEvent(statementContext);
+        dbDataExecuteUpdateEvent.setStatementEnum(StatementEnum.BATCH_PREPAREEDSTATEMENT);
+        applicationEventPublisher.publishEvent(dbDataExecuteUpdateEvent);
     }
 
     @Override
     public void onExecuteUpdate(StatementContext statementContext) {
-
+        DbDataExecuteUpdateEvent dbDataExecuteUpdateEvent = new DbDataExecuteUpdateEvent(statementContext);
+        dbDataExecuteUpdateEvent.setStatementEnum(StatementEnum.BATCH_PREPAREEDSTATEMENT);
+        applicationEventPublisher.publishEvent(dbDataExecuteUpdateEvent);
     }
 
     @Override
@@ -38,7 +33,7 @@ public class DataUpdateEventListenerImpl implements DataUpdateEventListener {
     }
 
     @Override
-    public void onTransactionCommit(ConnectionContext statementContext) {
+    public void onTransactionCommit(TransactionContext statementContext) {
 
     }
 }
