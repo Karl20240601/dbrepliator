@@ -16,14 +16,12 @@ public class DataUpdateEventListenerImpl implements DataUpdateEventListener {
     @Override
     public void onPreparedExecuteUpdate(PreparedStatementContext statementContext) {
         DbDataExecuteUpdateEvent dbDataExecuteUpdateEvent = DbDataExecuteUpdateEventFactory.createDbDataExecuteUpdateEvent(statementContext);
-        dbDataExecuteUpdateEvent.setStatementEnum(StatementEnum.PREPAREEDSTATEMENT);
         applicationEventPublisher.publishEvent(dbDataExecuteUpdateEvent);
     }
 
     @Override
     public void onExecuteUpdate(StatementContext statementContext) {
         DbDataExecuteUpdateEvent dbDataExecuteUpdateEvent = DbDataExecuteUpdateEventFactory.createDbDataExecuteUpdateEvent(statementContext);
-        dbDataExecuteUpdateEvent.setStatementEnum(StatementEnum.STATEMENT);
         applicationEventPublisher.publishEvent(dbDataExecuteUpdateEvent);
     }
 
