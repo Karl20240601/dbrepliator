@@ -16,19 +16,21 @@ public class DataUpdateEventListenerImpl implements DataUpdateEventListener {
     @Override
     public void onPreparedExecuteUpdate(PreparedStatementContext statementContext) {
         DbDataExecuteUpdateEvent dbDataExecuteUpdateEvent = DbDataExecuteUpdateEventFactory.createDbDataExecuteUpdateEvent(statementContext);
-        dbDataExecuteUpdateEvent.setStatementEnum(StatementEnum.BATCH_PREPAREEDSTATEMENT);
+        dbDataExecuteUpdateEvent.setStatementEnum(StatementEnum.PREPAREEDSTATEMENT);
         applicationEventPublisher.publishEvent(dbDataExecuteUpdateEvent);
     }
 
     @Override
     public void onExecuteUpdate(StatementContext statementContext) {
-        DbDataExecuteUpdateEvent dbDataExecuteUpdateEvent = new DbDataExecuteUpdateEvent(statementContext);
-        dbDataExecuteUpdateEvent.setStatementEnum(StatementEnum.BATCH_PREPAREEDSTATEMENT);
+        DbDataExecuteUpdateEvent dbDataExecuteUpdateEvent = DbDataExecuteUpdateEventFactory.createDbDataExecuteUpdateEvent(statementContext);
+        dbDataExecuteUpdateEvent.setStatementEnum(StatementEnum.STATEMENT);
         applicationEventPublisher.publishEvent(dbDataExecuteUpdateEvent);
     }
 
     @Override
-    public void onConnectionCommit(ConnectionContext statementContext) {
+    public void onConnectionCommit(ConnectionContext connectionContext) {
+        BatchDbDataExecuteUpdateEvent batchDbDataExecuteUpdateEvent = DbDataExecuteUpdateEventFactory.createBatchDbDataExecuteUpdateEvent(connectionContext);
+        applicationEventPublisher.publishEvent(batchDbDataExecuteUpdateEvent);
 
     }
 

@@ -5,6 +5,4 @@ import java.io.Serializable;
 public enum StatementEnum implements Serializable {
     STATEMENT,
     PREPAREEDSTATEMENT,
-    BATCH_STATEMENT,
-    BATCH_PREPAREEDSTATEMENT;
 }
