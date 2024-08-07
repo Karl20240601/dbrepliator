@@ -4,10 +4,11 @@ import io.microsphere.spring.db.support.enums.StatementEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 
 import java.sql.SQLException;
 
-public class DataUpdateEventListenerImpl implements DataUpdateEventListener {
+public class DataUpdateEventListenerImpl implements DataUpdateEventListener, ApplicationEventPublisherAware {
     public static final String BEAN_NAME = "preparedStatementEventListenerImpl";
 
     private static final Logger logger = LoggerFactory.getLogger(DataUpdateEventListenerImpl.class);
@@ -35,5 +36,10 @@ public class DataUpdateEventListenerImpl implements DataUpdateEventListener {
     @Override
     public void onTransactionCommit(TransactionContext statementContext) {
 
+    }
+
+    @Override
+    public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 }

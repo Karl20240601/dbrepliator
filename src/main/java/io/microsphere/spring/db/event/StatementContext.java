@@ -12,16 +12,14 @@ public class StatementContext {
         appendSql(sql);
     }
 
-    public void addSql(String sql) {
-        appendSql(sql);
-    }
 
     private void appendSql(String sql) {
         if (sqlNum == 0) {
-            appendSql(sql);
+            stringBuilder.append(sql);
+            return;
         }
-        appendSql(";");
-        appendSql(sql);
+        stringBuilder.append(";");
+        stringBuilder.append(sql);
         increSqlNum();
     }
 
