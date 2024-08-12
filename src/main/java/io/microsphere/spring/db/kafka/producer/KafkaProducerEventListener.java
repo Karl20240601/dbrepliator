@@ -1,6 +1,5 @@
 package io.microsphere.spring.db.kafka.producer;
 
-import com.alibaba.fastjson.JSONObject;
 import io.microsphere.spring.db.config.DBReplicatorConfiguration;
 import io.microsphere.spring.db.event.DbDataExecuteUpdateEvent;
 import io.microsphere.spring.db.serialize.api.ObjectOutput;
@@ -14,6 +13,9 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.event.SmartApplicationListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
@@ -57,31 +59,18 @@ public class KafkaProducerEventListener implements SmartApplicationListener, App
         this.executor = Executors.newFixedThreadPool(size, new CustomizableThreadFactory(domains.toString()));
     }
 
+
+
     private void sendRedisReplicatorKafkaMessage(String domain, DbDataExecuteUpdateEvent event) {
-        String topic = createTopic(domain);
-        // Almost all RedisCommands interface methods take the first argument as Key
         byte[] key = serialize(event.getMessageKey());
         byte[] value = serialize(event);
-        // Use a timestamp of the event
-        long timestamp = event.getTimestamp();
-        ListenableFuture<SendResult<byte[], byte[]>> future = kafkaTemplate.send(topic, null, timestamp, key, value);
-        future.addCallback(new ListenableFutureCallback<SendResult<byte[], byte[]>>() {
-
-            @Override
-            public void onSuccess(SendResult<byte[], byte[]> result) {
-                logger.debug("[Redis-Replicator-Kafka-P-S] Kafka message sending operation succeeds. Topic: {}, key: {}, data size: {} bytes, event: {}",
-                        "topics", key, value.length, event);
-            }
-
-            @Override
-            public void onFailure(Throwable e) {
-                logger.warn("[Redis-Replicator-Kafka-P-F] Kafka message sending operation failed. Topic: {}, key: {}, data size: {} bytes",
-                        "topics", key, value.length, e);
-            }
-
-        });
+        Message<byte[]> message = MessageBuilder
+                .withPayload(value)
+                .setHeader("messageKey", key)
+                .setHeader("timestamp", event.getTimestamp())
+                .build();
+        dbReplicatorConfiguration.getMessageChannel(domain).send(message);
     }
-
 
 
     private String createTopic(String domain) {
@@ -94,7 +83,7 @@ public class KafkaProducerEventListener implements SmartApplicationListener, App
         this.dbReplicatorConfiguration = applicationContext.getBean(DBReplicatorConfiguration.class);
     }
 
-    private byte[] serialize(Object o){
+    private byte[] serialize(Object o) {
         try {
             Serialization serialization = dbReplicatorConfiguration.getSerialization();
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -102,7 +91,7 @@ public class KafkaProducerEventListener implements SmartApplicationListener, App
             serialize.writeObject(o);
             serialize.flushBuffer();
             return byteArrayOutputStream.toByteArray();
-        }catch (IOException e){
+        } catch (IOException e) {
             logger.error("serizal fail");
             throw new RuntimeException(e);
         }

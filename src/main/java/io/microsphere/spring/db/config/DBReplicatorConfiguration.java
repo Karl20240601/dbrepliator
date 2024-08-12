@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
+import org.springframework.messaging.MessageChannel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,5 +67,9 @@ public class DBReplicatorConfiguration implements ApplicationContextAware, Envir
     public Serialization getSerialization(){
         AbstractHessian2FactoryInitializer.getSerializerFactory1();
         return new Hessian2Serialization();
+    }
+
+    public MessageChannel getMessageChannel(String domain){
+        return null;
     }
 }
