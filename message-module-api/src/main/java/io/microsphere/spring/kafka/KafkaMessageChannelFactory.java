@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-import io.microsphere.spring.common.AbstractSubcribableChannelFactory;
+import io.microsphere.spring.common.producer.AbstractMessageChannelFactory;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
@@ -14,21 +14,13 @@ import org.springframework.messaging.MessageChannel;
 
 import static org.apache.kafka.clients.CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG;
 
-public class KafkaSubcribableChannelFactory extends AbstractSubcribableChannelFactory {
+public class KafkaMessageChannelFactory extends AbstractMessageChannelFactory {
     private ProducerFactory<byte[], byte[]> producerFactory;
     private Map<String, Object> producerConfigs;
-    private String groupId;
 
-    public String getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
-    }
 
     @Override
-    public MessageChannel createSubscribableChannel(String domins) {
+    public MessageChannel createMessageChannel(String domins) {
         KafkaTemplate kafkaTemplate = null;
         try {
             kafkaTemplate = this.configurableApplicationContext.getBean(KafkaTemplate.class);

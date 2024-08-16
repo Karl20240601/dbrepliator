@@ -1,7 +1,6 @@
-package io.microsphere.spring.common;
+package io.microsphere.spring.common.producer;
 
-import io.microsphere.spring.kafka.KafkaSubcribableChannelFactory;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import io.microsphere.spring.kafka.KafkaMessageChannelFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.EnvironmentAware;
@@ -23,9 +22,9 @@ public class MessageContextBeanDefinitionRegistrar implements ImportBeanDefiniti
 
     public void registerBeanDefinitions(BeanDefinitionRegistry registry) {
         //redisger 
-        String property = environment.getProperty(AbstractSubcribableChannelFactory.KAFKA_CONFIG_PROPERTIES);
+        String property = environment.getProperty(AbstractMessageChannelFactory.KAFKA_CONFIG_PROPERTIES);
         if(StringUtils.hasText(property)){
-            registry.registerBeanDefinition(SUBCRIBABLECHANNELFACTORY_BEAN_NAME,new RootBeanDefinition(KafkaSubcribableChannelFactory.class));
+            registry.registerBeanDefinition(SUBCRIBABLECHANNELFACTORY_BEAN_NAME,new RootBeanDefinition(KafkaMessageChannelFactory.class));
         }
     }
 

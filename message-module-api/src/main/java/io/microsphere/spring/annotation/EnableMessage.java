@@ -1,5 +1,6 @@
-package io.microsphere.spring.common;
+package io.microsphere.spring.annotation;
 
+import io.microsphere.spring.common.producer.MessageContextBeanDefinitionRegistrar;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;

@@ -1,4 +1,4 @@
-package io.microsphere.spring.common;
+package io.microsphere.spring.common.producer;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
@@ -7,7 +7,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.env.Environment;
 
 
-public abstract class AbstractSubcribableChannelFactory implements SubcribableChannelFactory, ApplicationContextAware, EnvironmentAware, DisposableBean {
+public abstract class AbstractMessageChannelFactory implements MessageChannelFactory, ApplicationContextAware, EnvironmentAware, DisposableBean {
     public final static String KAFKA_CONFIG_PROPERTIES = "spring.kafka.bootstrap-servers";
     public final static String RABBITMQ_CONFIG_PROPERTIES = "spring.kafka.bootstrap-servers";
     public final static String TOPIC_CONFIG_PROPERTIES = "spring.kafka.bootstrap-servers";
