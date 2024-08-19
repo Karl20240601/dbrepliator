@@ -11,7 +11,6 @@ import java.util.Map;
 
 public class KafkaConsumerEndpointFactory extends AbstractConsumerEndpointFactory {
 
-    public static final String KAFKA_CONSUMER_PROPERTY_NAME_PREFIX =  + "consumer.";
 
 
     private final Map<String, SubscribableChannel> topicSubscribableChannel = new HashMap<>();
@@ -21,7 +20,12 @@ public class KafkaConsumerEndpointFactory extends AbstractConsumerEndpointFactor
         DefaultDispatcher defaultDispatcher = new DefaultDispatcher();
         AbstractSubscribableChannel abstractSubscribableChannel = new AbstractSubscribableChannel(defaultDispatcher, topic, group);
         String[] topics = {topic};
-        KafkaConsumerEndpoint kafkaConsumerEndpoint = new KafkaConsumerEndpoint(abstractSubscribableChannel, new HashMap<>(), topics, group);
+        KafkaConsumerEndpoint kafkaConsumerEndpoint = new KafkaConsumerEndpoint(new HashMap<>(), topics, group);
         return kafkaConsumerEndpoint;
+    }
+
+    @Override
+    public void bindConsumber(String tpoics) {
+
     }
 }

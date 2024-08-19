@@ -3,6 +3,7 @@ package io.microsphere.spring.kafka.comsumber;
 import io.microsphere.spring.common.comsumber.AbstractConsumerEndpoint;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.BatchAcknowledgingMessageListener;
@@ -23,16 +24,17 @@ import static java.util.Collections.unmodifiableMap;
 
 public class KafkaConsumerEndpoint extends AbstractConsumerEndpoint {
     private SubscribableChannel subscribableChannel;
-    private final Map<String, String> mapProperties;
+    private final Map<String, Object> mapProperties;
     private final String[] topics;
     private final String group;
     private boolean running;
     private ConsumerFactory<byte[], byte[]> kafkaConsumerFactory;
     private ConcurrentMessageListenerContainer<byte[], byte[]> listenerContainer;
+    private BeanFactory beanFactory;
 
 
-    public KafkaConsumerEndpoint(SubscribableChannel subscribableChannel, Map<String, String> mapProperties, String[] topics,String group) {
-        this.subscribableChannel = subscribableChannel;
+    public KafkaConsumerEndpoint( BeanFactory beanFactory,Map<String, Object> mapProperties, String[] topics,String group) {
+        this.beanFactory = beanFactory;
         this.mapProperties = unmodifiableMap(mapProperties);
         this.topics = topics;
         this.group = group;
@@ -46,7 +48,6 @@ public class KafkaConsumerEndpoint extends AbstractConsumerEndpoint {
     }
 
 
-    @Override
     public void start() {
         this.listenerContainer.setupMessageListener(new BatchAcknowledgingMessageListener<byte[], byte[]>() {
             @Override
@@ -61,14 +62,6 @@ public class KafkaConsumerEndpoint extends AbstractConsumerEndpoint {
         this.running = true;
     }
 
-    @Override
-    public void stop() {
-    }
-
-    @Override
-    public boolean isRunning() {
-        return running;
-    }
 
 
     public ConcurrentMessageListenerContainer<byte[], byte[]> createReplicatorConcurrentMessageListenerContainer() {
