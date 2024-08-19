@@ -1,31 +1,37 @@
 package io.microsphere.spring.kafka.comsumber;
 
 import io.microsphere.spring.common.comsumber.AbstractConsumerEndpointFactory;
-import io.microsphere.spring.common.comsumber.AbstractSubscribableChannel;
 import io.microsphere.spring.common.comsumber.ConsumerEndpoint;
-import io.microsphere.spring.common.comsumber.DefaultDispatcher;
-import org.springframework.messaging.SubscribableChannel;
+import io.microsphere.spring.common.comsumber.MessageReplSubscribableChannel;
+import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class KafkaConsumerEndpointFactory extends AbstractConsumerEndpointFactory {
-
-
-
-    private final Map<String, SubscribableChannel> topicSubscribableChannel = new HashMap<>();
-
     @Override
     public ConsumerEndpoint createConsumerEndpoint(String topic, String group) {
-        DefaultDispatcher defaultDispatcher = new DefaultDispatcher();
-        AbstractSubscribableChannel abstractSubscribableChannel = new AbstractSubscribableChannel(defaultDispatcher, topic, group);
-        String[] topics = {topic};
-        KafkaConsumerEndpoint kafkaConsumerEndpoint = new KafkaConsumerEndpoint(new HashMap<>(), topics, group);
+        String[] topics = StringUtils.split(topic,",");
+        KafkaConsumerEndpoint kafkaConsumerEndpoint = new KafkaConsumerEndpoint(configurableApplicationContext.getBeanFactory(),new HashMap<>(), topics, group);
         return kafkaConsumerEndpoint;
     }
 
     @Override
-    public void bindConsumber(String tpoics) {
+    public void doBindConsumber(String tpoics) {
+        MessageReplSubscribableChannel subscribableChannel = super.configurableApplicationContext.getBean(tpoics, MessageReplSubscribableChannel.class);
+        String topic = subscribableChannel.getTopic();
+        String group = subscribableChannel.getGroup();
+        ConsumerEndpoint consumerEndpoint = createConsumerEndpoint(topic, group);
+        consumerEndpoint.setInputMessageChannel(subscribableChannel);
 
+    }
+
+    @Override
+    public void stop() {
+
+    }
+
+    @Override
+    public boolean isRunning() {
+        return false;
     }
 }

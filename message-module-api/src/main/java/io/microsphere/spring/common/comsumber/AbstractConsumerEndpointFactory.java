@@ -1,19 +1,14 @@
 package io.microsphere.spring.common.comsumber;
 
-import io.microsphere.spring.util.PropertySourcesUtils;
+
 import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.EnvironmentAware;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.*;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 
-import java.util.List;
-import java.util.Map;
 
-public abstract class AbstractConsumerEndpointFactory implements ConsumerEndpointFactory, ApplicationContextAware, EnvironmentAware {
-
+public abstract class AbstractConsumerEndpointFactory implements ConsumerEndpointFactory, ApplicationContextAware, EnvironmentAware, SmartLifecycle {
     protected ConfigurableApplicationContext configurableApplicationContext;
     protected ConfigurableEnvironment environment;
 
@@ -28,5 +23,19 @@ public abstract class AbstractConsumerEndpointFactory implements ConsumerEndpoin
         this.environment = (ConfigurableEnvironment) environment;
     }
 
+    @Override
+    public void start() {
+        bindConsumber();
+    }
 
+    @Override
+    public void bindConsumber() {
+        ConfigurableListableBeanFactory beanFactory = configurableApplicationContext.getBeanFactory();
+        String[] beanNamesForType = beanFactory.getBeanNamesForType(MessageReplSubscribableChannel.class);
+        for (String beanName : beanNamesForType) {
+            doBindConsumber(beanName);
+        }
+    }
+
+    public abstract void doBindConsumber(String beanName);
 }

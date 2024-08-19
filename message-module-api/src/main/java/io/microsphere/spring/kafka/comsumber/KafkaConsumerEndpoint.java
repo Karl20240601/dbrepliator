@@ -45,10 +45,11 @@ public class KafkaConsumerEndpoint extends AbstractConsumerEndpoint {
     @Override
     public void setInputMessageChannel(SubscribableChannel subscribableChannel) {
         this.subscribableChannel = subscribableChannel;
+        start();
     }
 
 
-    public void start() {
+    private void start() {
         this.listenerContainer.setupMessageListener(new BatchAcknowledgingMessageListener<byte[], byte[]>() {
             @Override
             public void onMessage(List<ConsumerRecord<byte[], byte[]>> data, Acknowledgment acknowledgment) {
@@ -69,16 +70,6 @@ public class KafkaConsumerEndpoint extends AbstractConsumerEndpoint {
         ContainerProperties containerProperties = new ContainerProperties(topics);
         this.listenerContainer = new ConcurrentMessageListenerContainer<>(this.kafkaConsumerFactory, containerProperties);
         listenerContainer.setConcurrency(getConcurrency(topics));
-        listenerContainer.setupMessageListener(new BatchAcknowledgingMessageListener<byte[], byte[]>() {
-            @Override
-            public void onMessage(List<ConsumerRecord<byte[], byte[]>> data, Acknowledgment acknowledgment) {
-                List<Message<byte[]>> messages = converMessageList(data);
-                for (Message<byte[]> message : messages) {
-                    subscribableChannel.send(message);
-                }
-                acknowledgment.acknowledge();
-            }
-        });
         return listenerContainer;
     }
 
