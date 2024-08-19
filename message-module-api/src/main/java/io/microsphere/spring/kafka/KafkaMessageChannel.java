@@ -14,7 +14,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class KafkaSubscribableChannel extends AbstractMessageChannel {
+public class KafkaMessageChannel extends AbstractMessageChannel {
     protected Log logger = LogFactory.getLog(getClass());
 
     private final KafkaTemplate<?, ?> template;
@@ -22,7 +22,7 @@ public class KafkaSubscribableChannel extends AbstractMessageChannel {
     protected final String topic; // NOSONAR final
 
 
-    public KafkaSubscribableChannel(KafkaTemplate<?, ?> template, String topic) {
+    public KafkaMessageChannel(KafkaTemplate<?, ?> template, String topic) {
         Assert.notNull(template, "'template' cannot be null");
         Assert.notNull(topic, "'topic' cannot be null");
         this.template = template;

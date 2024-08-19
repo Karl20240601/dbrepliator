@@ -33,7 +33,7 @@ public class KafkaMessageChannelFactory extends AbstractMessageChannelFactory {
             kafkaTemplate = new KafkaTemplate<>(producerFactory);
         }
 
-        return new KafkaSubscribableChannel(kafkaTemplate, String.format("%s%s", TOPIC_NAMES_PREFIX, domins));
+        return new KafkaMessageChannel(kafkaTemplate, String.format("%s%s", TOPIC_NAMES_PREFIX, domins));
     }
 
     private ProducerFactory<byte[], byte[]> createReplicatorProducerFactory() {
