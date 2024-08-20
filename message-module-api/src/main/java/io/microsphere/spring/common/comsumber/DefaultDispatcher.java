@@ -26,4 +26,9 @@ public class DefaultDispatcher implements MessageDispatcher {
             messageHandler.handleMessage(message);
         }
     }
+
+    @Override
+    public int getCountMessageHandler() {
+        return messageHandlers.size();
+    }
 }
