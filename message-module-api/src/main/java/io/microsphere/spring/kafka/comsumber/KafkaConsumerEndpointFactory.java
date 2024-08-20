@@ -1,17 +1,17 @@
 package io.microsphere.spring.kafka.comsumber;
 
+import io.microsphere.spring.common.MessagePropertysConfiguration;
 import io.microsphere.spring.common.comsumber.AbstractConsumerEndpointFactory;
 import io.microsphere.spring.common.comsumber.ConsumerEndpoint;
 import io.microsphere.spring.common.comsumber.MessageReplSubscribableChannel;
 import org.springframework.util.StringUtils;
 
-import java.util.HashMap;
-
 public class KafkaConsumerEndpointFactory extends AbstractConsumerEndpointFactory {
     @Override
     public ConsumerEndpoint createConsumerEndpoint(String topic, String group) {
         String[] topics = StringUtils.split(topic,",");
-        KafkaConsumerEndpoint kafkaConsumerEndpoint = new KafkaConsumerEndpoint(configurableApplicationContext.getBeanFactory(),new HashMap<>(), topics, group);
+
+        KafkaConsumerEndpoint kafkaConsumerEndpoint = new KafkaConsumerEndpoint(configurableApplicationContext.getBeanFactory(),MessagePropertysConfiguration.initConsumerConfigs(environment,group), topics, group);
         return kafkaConsumerEndpoint;
     }
 
