@@ -16,13 +16,11 @@ public class KafkaConsumerEndpointFactory extends AbstractConsumerEndpointFactor
     }
 
     @Override
-    public void doBindConsumber(String tpoics) {
-        MessageReplSubscribableChannel subscribableChannel = super.configurableApplicationContext.getBean(tpoics, MessageReplSubscribableChannel.class);
+    public void doBindConsumber(MessageReplSubscribableChannel subscribableChannel) {
         String topic = subscribableChannel.getTopic();
         String group = subscribableChannel.getGroup();
         ConsumerEndpoint consumerEndpoint = createConsumerEndpoint(topic, group);
         consumerEndpoint.setInputMessageChannel(subscribableChannel);
-
     }
 
     @Override

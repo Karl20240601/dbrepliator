@@ -15,7 +15,6 @@ import org.springframework.messaging.SubscribableChannel;
 import org.springframework.messaging.support.GenericMessage;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -84,16 +83,13 @@ public class KafkaConsumerEndpoint extends AbstractConsumerEndpoint {
     }
 
     private ConsumerFactory<byte[], byte[]> createReplicatorConsumerFactory() {
-        DefaultKafkaConsumerFactory<byte[], byte[]> objectObjectDefaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(getConfigs());
+        DefaultKafkaConsumerFactory<byte[], byte[]> objectObjectDefaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(this.mapProperties);
         objectObjectDefaultKafkaConsumerFactory.setKeyDeserializer(new ByteArrayDeserializer());
         objectObjectDefaultKafkaConsumerFactory.setValueDeserializer(new ByteArrayDeserializer());
         return objectObjectDefaultKafkaConsumerFactory;
     }
 
-    private Map<String, Object> getConfigs() {
-        Map<String, Object> objectMap = new HashMap<>(this.mapProperties);
-        return getConfigs();
-    }
+
 
     private List<Message<byte[]>> converMessageList(List<ConsumerRecord<byte[], byte[]>> data) {
         List<Message<byte[]>> dataList = new ArrayList<>(data.size());
