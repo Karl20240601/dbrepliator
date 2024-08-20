@@ -4,7 +4,7 @@ import io.microsphere.spring.common.MessagePropertysConfiguration;
 import io.microsphere.spring.common.comsumber.AbstractConsumerEndpointFactory;
 import io.microsphere.spring.common.comsumber.ConsumerEndpoint;
 import io.microsphere.spring.common.comsumber.MessageReplSubscribableChannel;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class KafkaConsumerEndpointFactory extends AbstractConsumerEndpointFactory {
     @Override

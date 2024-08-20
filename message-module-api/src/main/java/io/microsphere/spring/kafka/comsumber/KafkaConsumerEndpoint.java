@@ -45,6 +45,8 @@ public class KafkaConsumerEndpoint extends AbstractConsumerEndpoint {
     public void setInputMessageChannel(SubscribableChannel subscribableChannel) {
         this.subscribableChannel = subscribableChannel;
         start();
+        listenerContainer.start();
+
     }
 
 
@@ -56,7 +58,6 @@ public class KafkaConsumerEndpoint extends AbstractConsumerEndpoint {
                 for (Message<byte[]> message : messages) {
                     subscribableChannel.send(message);
                 }
-                acknowledgment.acknowledge();
             }
         });
         this.running = true;

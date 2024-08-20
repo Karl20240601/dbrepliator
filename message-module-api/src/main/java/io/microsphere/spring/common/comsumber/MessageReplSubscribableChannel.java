@@ -46,6 +46,6 @@ public class MessageReplSubscribableChannel extends AbstractMessageChannel imple
     }
 
     public int getCountMessageHandler(){
-       return this.getCountMessageHandler();
+       return this.messageDispatcher.getCountMessageHandler();
     }
 }
