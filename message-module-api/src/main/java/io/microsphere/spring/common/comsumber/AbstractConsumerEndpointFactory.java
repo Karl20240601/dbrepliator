@@ -72,7 +72,7 @@ public abstract class AbstractConsumerEndpointFactory implements ConsumerEndpoin
                 subscribableChannel.subscribe(replMessageHandler);
             }
         }
-        return false;
+        return subscribableChannel.getCountMessageHandler()>0;
     }
 
 }

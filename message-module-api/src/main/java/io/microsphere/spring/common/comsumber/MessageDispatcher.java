@@ -9,4 +9,5 @@ public interface MessageDispatcher {
     void removeMessageHandler(MessageHandler messageHandler);
 
     void dipatch(Message message);
+    int getCountMessageHandler();
 }
