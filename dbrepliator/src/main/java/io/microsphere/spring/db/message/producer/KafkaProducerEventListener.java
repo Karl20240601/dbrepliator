@@ -1,4 +1,4 @@
-package io.microsphere.spring.db.kafka.producer;
+package io.microsphere.spring.db.message.producer;
 
 import io.microsphere.spring.db.config.DBReplicatorConfiguration;
 import io.microsphere.spring.db.config.MessageConfiguration;

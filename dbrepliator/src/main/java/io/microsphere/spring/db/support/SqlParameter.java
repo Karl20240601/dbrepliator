@@ -18,14 +18,14 @@ public class SqlParameter implements Serializable {
         this.javaType = javaType;
     }
 
-    private Object getValue() {
+    public Object getValue() {
         return value;
     }
-    private SQLType getSqlType() {
+    public SQLType getSqlType() {
         return sqlType;
     }
 
-    private Type getJavaType() {
+    public Type getJavaType() {
         return javaType;
     }
 

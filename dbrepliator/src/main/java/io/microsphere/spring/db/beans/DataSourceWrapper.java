@@ -33,11 +33,17 @@ public class DataSourceWrapper implements DataSource {
 
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
+        if(getClass()==iface){
+            return (T)this;
+        }
         return delegate.unwrap(iface);
     }
 
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
+        if(getClass()==iface){
+            return true;
+        }
         return delegate.isWrapperFor(iface);
     }
 

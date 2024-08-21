@@ -10,18 +10,20 @@ public class DbDataExecuteUpdateEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 8425295379903255511L;
 
-
     private int eventType;
     private String sql;
     private SqlParameter[] parameters;
     private String messageKey;
     private String beanName;
     private StatementEnum statementEnum;
-
+    public DbDataExecuteUpdateEvent() {
+        super("null");
+    }
 
     public DbDataExecuteUpdateEvent(Object source) {
         super(source);
     }
+
 
 
     public int getEventType() {
