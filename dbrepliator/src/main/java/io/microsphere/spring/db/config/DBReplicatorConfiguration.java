@@ -35,6 +35,11 @@ public class DBReplicatorConfiguration implements ApplicationContextAware, Envir
         return property;
     }
 
+    public List<String> getDomains(String beanName) {
+        List property = environment.getProperty(DB_REPLICATOR_DOMAINS, List.class, emptyList());
+        return property;
+    }
+
     public DataUpdateEventListener getPreparedStatementEventListener() {
         return applicationContext.getBean(DataUpdateEventListener.class);
     }

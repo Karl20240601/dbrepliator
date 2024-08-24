@@ -1,10 +1,8 @@
 package io.microsphere.spring.db.event;
 
-import io.microsphere.collection.CollectionUtils;
-import io.microsphere.spring.db.support.SqlParameter;
+import io.microsphere.spring.db.event.sqlmetadata.PreparedStatementSqlMetaData;
 import io.microsphere.spring.db.support.QueryBindings;
 import io.microsphere.spring.db.support.ValueOperation;
-import io.microsphere.spring.db.utils.SqlStringUtils;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -12,41 +10,28 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.*;
 import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.List;
 
 public class PreparedStatementContext extends StatementContext implements ValueOperation {
     private boolean autoCommit;
-    private List<SqlParameter[]> sqlParameters;
     private QueryBindings currentQueryBindings;
-    private final int parameters;
+    private PreparedStatementSqlMetaData preparedStatementSqlMetaData;
 
     public PreparedStatementContext(String sql) {
-        super(sql);
-        this.parameters = SqlStringUtils.findNumberOfPlaceholders(sql);
-        if (this.parameters > 0) {
-            currentQueryBindings = new QueryBindings(this.parameters);
-        }
+        super();
+        PreparedStatementSqlMetaData preparedStatementSqlMetaData = new PreparedStatementSqlMetaData(sql);
     }
-
-    public PreparedStatementContext(String sql, Object parameters) {
-        super(sql);
-        this.parameters = SqlStringUtils.findNumberOfPlaceholders(sql);
-        if (this.parameters > 0) {
-            currentQueryBindings = new QueryBindings(this.parameters);
-        }
-    }
-
-    public SqlParameter[] getSqlParameter(){
-        return currentQueryBindings.cloneBindValue();
-    }
-
 
     public void addBatch() {
-        if (CollectionUtils.isEmpty(sqlParameters)) {
-            sqlParameters = new LinkedList<>();
-        }
-        this.sqlParameters.add(currentQueryBindings.cloneBindValue());
+        preparedStatementSqlMetaData.addBatch(currentQueryBindings.cloneBindValue());
+        currentQueryBindings.clearBindValues();
+    }
+
+    public PreparedStatementSqlMetaData getPreparedStatementSqlMetaData() {
+        return preparedStatementSqlMetaData;
+    }
+
+    public void execute() {
+        preparedStatementSqlMetaData.addBatch(currentQueryBindings.cloneBindValue());
         currentQueryBindings.clearBindValues();
     }
 

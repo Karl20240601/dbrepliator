@@ -2,7 +2,9 @@ package io.microsphere.spring.db.message.producer;
 
 import io.microsphere.spring.db.config.DBReplicatorConfiguration;
 import io.microsphere.spring.db.config.MessageConfiguration;
+import io.microsphere.spring.db.event.BatchDbDataExecuteUpdateEvent;
 import io.microsphere.spring.db.event.DbDataExecuteUpdateEvent;
+import io.microsphere.spring.db.event.IDataExecuteUpdateEvent;
 import io.microsphere.spring.db.serialize.api.ObjectOutput;
 import io.microsphere.spring.db.serialize.api.Serialization;
 import org.slf4j.Logger;
@@ -12,7 +14,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.event.SmartApplicationListener;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
@@ -23,10 +24,9 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class KafkaProducerEventListener implements SmartApplicationListener, ApplicationContextAware {
-    private static final Logger logger = LoggerFactory.getLogger(KafkaProducerEventListener.class);
+public class ProducerEventListener implements SmartApplicationListener, ApplicationContextAware {
+    private static final Logger logger = LoggerFactory.getLogger(ProducerEventListener.class);
 
-    private KafkaTemplate<byte[], byte[]> kafkaTemplate;
     private ApplicationContext applicationContext;
     private ExecutorService executor;
     private DBReplicatorConfiguration dbReplicatorConfiguration;
@@ -34,17 +34,17 @@ public class KafkaProducerEventListener implements SmartApplicationListener, App
 
     @Override
     public boolean supportsEventType(Class<? extends ApplicationEvent> eventType) {
-        return DbDataExecuteUpdateEvent.class.equals(eventType);
+        return DbDataExecuteUpdateEvent.class.equals(eventType) || BatchDbDataExecuteUpdateEvent.class.equals(eventType);
     }
 
     @Override
     public void onApplicationEvent(ApplicationEvent event) {
-        DbDataExecuteUpdateEvent dbDataExecuteUpdateEvent = (DbDataExecuteUpdateEvent) event;
+        IDataExecuteUpdateEvent dbDataExecuteUpdateEvent = (IDataExecuteUpdateEvent) event;
         try {
-            String beanName = dbDataExecuteUpdateEvent.getBeanName();
+            String beanName = dbDataExecuteUpdateEvent.getDataSourceBeanName();
             List<String> domains = dbReplicatorConfiguration.getDomains(beanName);
             for (String domain : domains) {
-                executor.execute(() -> sendRedisReplicatorKafkaMessage(domain, dbDataExecuteUpdateEvent));
+                executor.execute(() -> sendRedisReplicatorMessage(domain, dbDataExecuteUpdateEvent));
             }
         } catch (Throwable e) {
             logger.warn("[Redis-Replicator-Kafka-P-F] Failed to perform Redis Replicator Kafka message sending operation.", e);
@@ -58,14 +58,14 @@ public class KafkaProducerEventListener implements SmartApplicationListener, App
     }
 
 
-
-    private void sendRedisReplicatorKafkaMessage(String domain, DbDataExecuteUpdateEvent event) {
-        byte[] key = serialize(event.getMessageKey());
-        byte[] value = serialize(event);
+    private void sendRedisReplicatorMessage(String domain, IDataExecuteUpdateEvent event) {
+        byte[] key = serialize(event.messageKey());
+        byte[] value = serialize(event.getEventData());
         Message<byte[]> message = MessageBuilder
                 .withPayload(value)
                 .setHeader("messageKey", key)
                 .setHeader("timestamp", event.getTimestamp())
+                .setHeader("isBatchUpdate", event.isBatch())
                 .build();
         messageConfiguration.getMessageChannel(domain).send(message);
     }

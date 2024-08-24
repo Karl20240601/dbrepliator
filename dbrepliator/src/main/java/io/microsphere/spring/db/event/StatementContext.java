@@ -1,38 +1,36 @@
 package io.microsphere.spring.db.event;
 
+import io.microsphere.spring.db.event.sqlmetadata.StatementSqlMetaData;
+
 public class StatementContext {
-    private StringBuilder stringBuilder = new StringBuilder();
-    private int sqlNum;
+    private StatementSqlMetaData statementSqlMetaData;
+    private String dataSourceBeanName;
 
     public StatementContext() {
-
+        this.statementSqlMetaData = new StatementSqlMetaData();
     }
 
     public StatementContext(String sql) {
         appendSql(sql);
     }
-
-
+    
     private void appendSql(String sql) {
-        if (sqlNum == 0) {
-            stringBuilder.append(sql);
-            return;
-        }
-        stringBuilder.append(";");
-        stringBuilder.append(sql);
-        increSqlNum();
+        statementSqlMetaData.addBatch(sql);
     }
-
-    private void increSqlNum() {
-        sqlNum++;
-    }
-
 
     public boolean isBatchUpdate() {
-        return this.sqlNum > 1;
+        return this.statementSqlMetaData.getBatchArgs().size() > 1;
     }
 
-    public String getSql() {
-        return stringBuilder.length() <= 0 ? null : stringBuilder.toString();
+    public StatementSqlMetaData getStatementSqlMetaData() {
+        return statementSqlMetaData;
+    }
+
+    public String getDataSourceBeanName() {
+        return dataSourceBeanName;
+    }
+
+    public void setDataSourceBeanName(String dataSourceBeanName) {
+        this.dataSourceBeanName = dataSourceBeanName;
     }
 }
