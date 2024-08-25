@@ -136,20 +136,6 @@ public class DbReplMessageHandler implements ReplMessageHandler, ApplicationCont
 
     }
 
-//    private void processBatchDbupdateEvent(byte[] bytes) throws Exception {
-////        DBReplicatorConfiguration bean = applicationContext.getBean(DBReplicatorConfiguration.class);
-////        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
-////        ObjectInput deserialize = bean.getSerialization().deserialize(byteArrayInputStream);
-////        List
-////        DbDataExecuteUpdateEvent dbDataExecuteUpdateEvent = deserialize.readObject(List<DbDataExecuteUpdateEventData>.class);
-////        DataSource dataSousrce2 = applicationContext.getBean("dataSousrce2", DataSource.class);
-////        PreparedStatement preparedStatement = dataSousrce2.getConnection().prepareStatement(dbDataExecuteUpdateEvent.getSql());
-////        SqlParameter[] parameters = dbDataExecuteUpdateEvent.getParameters();
-////        for (int i= 0; i<parameters.length;i++){
-////            preparedStatement.setObject(i+1,parameters[i].getValue());
-////        }
-////        preparedStatement.executeUpdate();
-//    }
 
 
 }
