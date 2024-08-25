@@ -56,4 +56,8 @@ public class DbDataExecuteUpdateEventData implements Serializable {
     public void setEventTimestamp(long eventTimestamp) {
         this.eventTimestamp = eventTimestamp;
     }
+
+    public boolean isBatchUpdate() {
+        return this.getSqlMetaData().getBatchArgs().size() > 1;
+    }
 }

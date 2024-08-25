@@ -35,7 +35,7 @@ public class DbDataExecuteUpdateEventFactory {
         DbDataExecuteUpdateEventData dbDataExecuteUpdateEventData = new DbDataExecuteUpdateEventData();
         dbDataExecuteUpdateEventData.setStatementEnum(StatementEnum.STATEMENT);
         dbDataExecuteUpdateEventData.setBeanName(statementContext.getDataSourceBeanName());
-        dbDataExecuteUpdateEventData.setMessageKey(SqlStringUtils.findTableNameBysql(statementSqlMetaData.getSingleExecuteSql()));
+        dbDataExecuteUpdateEventData.setMessageKey(SqlStringUtils.findTableNameBysql(statementSqlMetaData.takeSingleExecuteSql()));
         return dbDataExecuteUpdateEventData;
     }
 

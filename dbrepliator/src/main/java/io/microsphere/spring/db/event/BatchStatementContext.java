@@ -11,7 +11,6 @@ public class BatchStatementContext {
     public BatchStatementContext() {
 
     }
-
     public void addSql(String sql) {
         if (CollectionUtils.isEmpty(sqlList)) {
             sqlList = new LinkedList<>();
