@@ -33,7 +33,6 @@ public abstract class AbstractConsumerEndpointFactory implements ConsumerEndpoin
         bindConsumber();
     }
 
-    @Override
     public void bindConsumber() {
         ConfigurableListableBeanFactory beanFactory = configurableApplicationContext.getBeanFactory();
         List<ReplMessageHandler> replCandidateMessageHandler = findReplCandidateMessageHandler(beanFactory);
