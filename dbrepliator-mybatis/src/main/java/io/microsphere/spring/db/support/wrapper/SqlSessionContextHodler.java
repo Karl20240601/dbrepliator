@@ -26,10 +26,6 @@ public class SqlSessionContextHodler {
         }
     }
 
-    public static void setSqlSessionFactorybeanName(String sqlSessionFactorybeanName) {
-        getLocalSqlSessionContext().setSqlSessionFactorybeanName(sqlSessionFactorybeanName);
-    }
-
     private static SqlSessionContext getLocalSqlSessionContext() {
         SqlSessionContext sqlSessionContext = SQLEXECUTECONTEXT_HODLER.get();
         if (sqlSessionContext == null) {
@@ -38,7 +34,7 @@ public class SqlSessionContextHodler {
         return sqlSessionContext;
     }
 
-    public static void init(String sqlSessionFactorybeanName, Object[] value,boolean autoCommit) {
+    public static void init(String sqlSessionFactorybeanName, Object[] value, boolean autoCommit) {
         SqlSessionContext localSqlSessionContext = getLocalSqlSessionContext();
         localSqlSessionContext.setSqlSessionFactorybeanName(sqlSessionFactorybeanName);
         localSqlSessionContext.setAutoCommit(autoCommit);

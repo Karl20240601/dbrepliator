@@ -13,8 +13,7 @@ import java.util.Map;
 
 public class MessageConfiguration implements SmartApplicationListener {
     private ApplicationContext context;
-    private Map<String, MessageChannel> subscribableChannelDomianMap = new HashMap<>();
-    private DBReplicatorConfiguration dbReplicatorConfiguration;
+    private Map<String, MessageChannel> messageChannelDomianMap = new HashMap<>();
 
     @Override
     public boolean supportsEventType(Class<? extends ApplicationEvent> eventType) {
@@ -30,17 +29,23 @@ public class MessageConfiguration implements SmartApplicationListener {
 
     private void onContextRefreshedEvent(ContextRefreshedEvent event) {
         ApplicationContext context = event.getApplicationContext();
+        DBReplicatorConfiguration dbReplicatorConfiguration = context.getBean(DBReplicatorConfiguration.class);
+        dbReplicatorConfiguration.init();
+        initMessageChannel(context, dbReplicatorConfiguration);
+    }
+
+    private void initMessageChannel(ApplicationContext context, DBReplicatorConfiguration dbReplicatorConfiguration) {
         MessageChannelFactory bean = context.getBean(MessageChannelFactory.class);
-        this.dbReplicatorConfiguration = context.getBean(DBReplicatorConfiguration.class);
-        List<String> domains = this.dbReplicatorConfiguration.getDomains();
+
+        List<String> domains = dbReplicatorConfiguration.getDomains();
         for (String domain : domains) {
             MessageChannel messageChannel = bean.createMessageChannel(domain);
-            subscribableChannelDomianMap.put(domain, messageChannel);
+            messageChannelDomianMap.put(domain, messageChannel);
         }
     }
 
-    public MessageChannel getMessageChannel(String domain){
-        return subscribableChannelDomianMap.get(domain);
+    public MessageChannel getMessageChannel(String domain) {
+        return messageChannelDomianMap.get(domain);
     }
 
 

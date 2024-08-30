@@ -17,7 +17,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.Assert;
 
-import static io.microsphere.spring.db.config.DBReplicatorConfiguration.DB_REPLICATOR_DOMAINS;
+import static io.microsphere.spring.db.config.DBReplicatorConfiguration.*;
 import static java.util.Arrays.asList;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
@@ -48,7 +48,7 @@ public class DbreplicatorBeanDefinitionRegistrar implements ImportBeanDefinition
     private void registerMessageHandlerBeanDefinition(BeanDefinitionRegistry registry) {
         String property = environment.getProperty(DB_REPLICATOR_DOMAINS);
         if (StringUtils.isBlank(property)) {
-            logger.debug("db.mssage.replicator.domains not config");
+            logger.debug("property '{}' not config",DB_REPLICATOR_DOMAINS);
             return;
         }
         String[] split = StringUtils.split(property, ",");
@@ -59,18 +59,18 @@ public class DbreplicatorBeanDefinitionRegistrar implements ImportBeanDefinition
     }
 
     private void registerMessageHandler(BeanDefinitionRegistry registry, String beanNamePrefix) {
-        String beanName = beanNamePrefix + "messageHandler";
+        String beanName = beanNamePrefix + MESSAGEHANDLER_NAME_PREFIX;
         BeanDefinitionBuilder beanDefinitionBuilder = genericBeanDefinition(DbReplMessageHandler.class);
-        beanDefinitionBuilder.addConstructorArgValue("db-synchronize-message-" + beanNamePrefix);
+        beanDefinitionBuilder.addConstructorArgValue(getTopicPrefix(DB_REPLICATOR_TOPICPREFIX) + beanNamePrefix);
         registry.registerBeanDefinition(beanName, beanDefinitionBuilder.getBeanDefinition());
     }
 
     private void registerSubcriberChannel(BeanDefinitionRegistry registry, String beanNamePrefix) {
-        String beanName2 = beanNamePrefix + "messageReplSubscribableChannel";
+        String beanName2 = beanNamePrefix + MESSAGEREPLSUBSCRIBABLECHANNEL;
         BeanDefinitionBuilder beanDefinitionBuilder2 = genericBeanDefinition(MessageReplSubscribableChannel.class);
         beanDefinitionBuilder2.addConstructorArgValue(new DefaultDispatcher());
-        beanDefinitionBuilder2.addConstructorArgValue("db-synchronize-message-" + beanNamePrefix);
-        beanDefinitionBuilder2.addConstructorArgValue(beanNamePrefix + "db-synchronize-message-group");
+        beanDefinitionBuilder2.addConstructorArgValue(getTopicPrefix(DB_REPLICATOR_TOPICPREFIX) + beanNamePrefix);
+        beanDefinitionBuilder2.addConstructorArgValue(beanNamePrefix + DB_REPLICATOR_TOPICPREFIX_DEFAULT+"group");
         registry.registerBeanDefinition(beanName2, beanDefinitionBuilder2.getBeanDefinition());
     }
 
@@ -78,5 +78,9 @@ public class DbreplicatorBeanDefinitionRegistrar implements ImportBeanDefinition
     public void setEnvironment(Environment environment) {
         Assert.isInstanceOf(ConfigurableEnvironment.class, environment);
         this.environment = (ConfigurableEnvironment) environment;
+    }
+
+    private String getTopicPrefix(String property){
+        return environment.getProperty(property,DB_REPLICATOR_TOPICPREFIX_DEFAULT);
     }
 }
