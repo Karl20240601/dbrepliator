@@ -20,7 +20,7 @@ public class KafkaMessageChannelFactory extends AbstractMessageChannelFactory {
 
 
     @Override
-    public MessageChannel createMessageChannel(String domins) {
+    public MessageChannel createMessageChannel(String topics) {
         KafkaTemplate kafkaTemplate = null;
         try {
             kafkaTemplate = this.configurableApplicationContext.getBean(KafkaTemplate.class);
@@ -33,7 +33,7 @@ public class KafkaMessageChannelFactory extends AbstractMessageChannelFactory {
             kafkaTemplate = new KafkaTemplate<>(producerFactory);
         }
 
-        return new KafkaMessageChannel(kafkaTemplate, String.format("%s%s", TOPIC_NAMES_PREFIX, domins));
+        return new KafkaMessageChannel(kafkaTemplate, topics);
     }
 
     private ProducerFactory<byte[], byte[]> createReplicatorProducerFactory() {

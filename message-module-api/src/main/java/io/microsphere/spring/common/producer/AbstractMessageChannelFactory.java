@@ -11,7 +11,6 @@ public abstract class AbstractMessageChannelFactory implements MessageChannelFac
     public final static String KAFKA_CONFIG_PROPERTIES = "spring.kafka.bootstrap-servers";
     public final static String RABBITMQ_CONFIG_PROPERTIES = "spring.kafka.bootstrap-servers";
     public final static String TOPIC_CONFIG_PROPERTIES = "spring.kafka.bootstrap-servers";
-    protected final static String TOPIC_NAMES_PREFIX = "db-synchronize-message-";
 
     protected ConfigurableApplicationContext configurableApplicationContext;
     protected Environment environment;
