@@ -1,8 +1,6 @@
 package io.microsphere.spring.db.config;
 
-import io.microsphere.spring.db.event.DataUpdateEventListener;
 import io.microsphere.spring.db.serialize.api.Serialization;
-import io.microsphere.spring.db.serialize.hessian2.AbstractHessian2FactoryInitializer;
 import io.microsphere.spring.db.serialize.hessian2.Hessian2Serialization;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.beans.BeansException;
@@ -21,8 +19,7 @@ import static java.util.Collections.unmodifiableMap;
 public class DBReplicatorConfiguration implements ApplicationContextAware, EnvironmentAware {
     public final static String DB_REPLICATOR_PREFIX= "db.message.replicator.";
     public final static String DB_REPLICATOR_DOMAINS = DB_REPLICATOR_PREFIX+"domains";
-    public final static String DB_REPLICATOR_TOPICPREFIX = "topic.prefix";
-    public final static String DB_REPLICATOR_TOPICPREFIX_DEFAULT = "topic.prefix";
+    public final static String DB_REPLICATOR_TOPICPREFIX_DEFAULT = "db-synchronize-message-";
     public final static String DB_REPLICATOR_ENABLE = "db.replicator.enable";
     public final static String MESSAGEHANDLER_NAME_PREFIX = "messageHandler";
     public final static String MESSAGEREPLSUBSCRIBABLECHANNEL = "messageReplSubscribableChannel";
@@ -37,7 +34,11 @@ public class DBReplicatorConfiguration implements ApplicationContextAware, Envir
     private Map<String, SqlSessionFactory> sqlSessionFactoryMap;
 
     public String keyPrefix() {
-        return environment.getProperty(DB_REPLICATOR_DOMAINS_KEYPREFIX);
+        return keyPrefix(environment);
+    }
+
+    private static  String keyPrefix(Environment environment) {
+        return environment.getProperty(DB_REPLICATOR_DOMAINS_KEYPREFIX,DB_REPLICATOR_TOPICPREFIX_DEFAULT);
     }
 
 
@@ -51,9 +52,6 @@ public class DBReplicatorConfiguration implements ApplicationContextAware, Envir
         return property;
     }
 
-    public DataUpdateEventListener getPreparedStatementEventListener() {
-        return applicationContext.getBean(DataUpdateEventListener.class);
-    }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -76,7 +74,8 @@ public class DBReplicatorConfiguration implements ApplicationContextAware, Envir
     }
 
     public Serialization getSerialization() {
-        return this.serialization;
+       // return this.serialization;
+        return new Hessian2Serialization();
     }
 
 
@@ -100,6 +99,15 @@ public class DBReplicatorConfiguration implements ApplicationContextAware, Envir
 
     public SqlSessionFactory getSqlSessionFactory(String beanName) {
         return sqlSessionFactoryMap.get(beanName);
+    }
+
+    public String createTopic(String domain) {
+        return keyPrefix() + domain;
+    }
+
+
+    public static String createTopic(Environment environment,String domainName){
+        return  keyPrefix(environment)+domainName;
     }
 
 }

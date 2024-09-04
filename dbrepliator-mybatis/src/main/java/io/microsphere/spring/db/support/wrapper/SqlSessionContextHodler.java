@@ -20,16 +20,13 @@ public class SqlSessionContextHodler {
             return;
         }
         SQLEXECUTECONTEXT_HODLER.set(null);
-        List<StatementParamer> tatementParamers = sqlSessionContext.getTatementParamers();
-        if (tatementParamers != null && !tatementParamers.isEmpty()) {
-            tatementParamers.clear();
-        }
     }
 
     private static SqlSessionContext getLocalSqlSessionContext() {
         SqlSessionContext sqlSessionContext = SQLEXECUTECONTEXT_HODLER.get();
         if (sqlSessionContext == null) {
             sqlSessionContext = new SqlSessionContext();
+            SQLEXECUTECONTEXT_HODLER.set(sqlSessionContext);
         }
         return sqlSessionContext;
     }

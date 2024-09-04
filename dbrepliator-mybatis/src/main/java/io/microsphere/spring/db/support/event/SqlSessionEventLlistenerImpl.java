@@ -2,8 +2,9 @@ package io.microsphere.spring.db.support.event;
 
 import io.microsphere.spring.db.support.wrapper.SqlSessionContext;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 
-public class SqlSessionEventLlistenerImpl implements SqlSessionEventLlistener {
+public class SqlSessionEventLlistenerImpl implements SqlSessionEventLlistener, ApplicationEventPublisherAware {
     private ApplicationEventPublisher applicationEventPublisher;
 
     @Override
@@ -27,8 +28,13 @@ public class SqlSessionEventLlistenerImpl implements SqlSessionEventLlistener {
     }
 
     private DbDataUpdateEvent createDbDataUpdateEvent(SqlSessionContext sqlSessionContext) {
-        DbDataUpdateEvent dbDataUpdateEvent = new DbDataUpdateEvent(this);
+        DbDataUpdateEvent dbDataUpdateEvent = new DbDataUpdateEvent(sqlSessionContext);
         dbDataUpdateEvent.setSqlSessionContext(sqlSessionContext);
         return dbDataUpdateEvent;
+    }
+
+    @Override
+    public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 }

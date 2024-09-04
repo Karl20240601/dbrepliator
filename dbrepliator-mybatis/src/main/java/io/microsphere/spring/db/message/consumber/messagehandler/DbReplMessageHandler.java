@@ -12,6 +12,7 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.messaging.Message;
@@ -28,13 +29,13 @@ import java.util.function.BiFunction;
 
 import static java.util.Collections.unmodifiableMap;
 
-public class DbReplMessageHandler implements ReplMessageHandler, ApplicationContextAware {
+public class DbReplMessageHandler implements ReplMessageHandler, ApplicationContextAware, SmartInitializingSingleton {
     private final String inputChannel;
     private ApplicationContext applicationContext;
     private DBReplicatorConfiguration dbReplicatorConfiguration;
-    static final Map<SqlSessionMethodKey, BiFunction<SqlSessionFactory, Object[], SqlSession>> redisCommandBindings = initSqlSessionBindings();
-
     private static final Logger logger = LoggerFactory.getLogger(DbReplMessageHandler.class);
+    private final Map<SqlSessionMethodKey, BiFunction<SqlSessionFactory, Object[], SqlSession>> redisCommandBindings = initSqlSessionBindings();
+
 
 
     public DbReplMessageHandler(String inputChannel) {
@@ -59,6 +60,7 @@ public class DbReplMessageHandler implements ReplMessageHandler, ApplicationCont
         try {
             processDbupdateEvent(bytes);
         } catch (Exception e) {
+            logger.error("exception",e);
             throw new MessagingException(message, e);
         }
     }
@@ -70,10 +72,11 @@ public class DbReplMessageHandler implements ReplMessageHandler, ApplicationCont
         ObjectInput deserialize = dbReplicatorConfiguration.getSerialization().deserialize(byteArrayInputStream);
 
         DbDataUpdateEvent dbDataUpdateEvent = deserialize.readObject(DbDataUpdateEvent.class);
+        logger.debug("receive data {}", JSONObject.toJSONString(dbDataUpdateEvent));
         SqlSessionContext sqlSessionContext = dbDataUpdateEvent.getSqlSessionContext();
 
         SqlSession sqlSession = getSqlSession(sqlSessionContext);
-        List<StatementParamer> statementParamers = dbDataUpdateEvent.getSqlSessionContext().getTatementParamers();
+        List<StatementParamer> statementParamers = dbDataUpdateEvent.getSqlSessionContext().getStatementParamers();
         for (StatementParamer statementParamer : statementParamers) {
             sqlSession.update(statementParamer.getStatement(), statementParamer.getObjectParamter());
         }
@@ -154,5 +157,10 @@ public class DbReplMessageHandler implements ReplMessageHandler, ApplicationCont
         BiFunction<SqlSessionFactory, Object[], SqlSession> biFunction = (sqlSessionFactory, objectValuse) -> (SqlSession) ReflectionUtils.invokeMethod(redisCommandMethod, sqlSessionFactory, objectValuse);
         redisCommandBindings.put(sqlSessionMethodKey, biFunction);
         logger.debug("Redis command interface {} Bind RedisConnection command object method {}", sqlSessionMethodKey, redisCommandMethod);
+    }
+
+    @Override
+    public void afterSingletonsInstantiated() {
+        this.dbReplicatorConfiguration = applicationContext.getBean(DBReplicatorConfiguration.class);
     }
 }

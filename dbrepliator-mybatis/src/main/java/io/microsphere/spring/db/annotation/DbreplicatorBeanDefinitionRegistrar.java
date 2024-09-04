@@ -2,9 +2,9 @@ package io.microsphere.spring.db.annotation;
 
 import io.microsphere.spring.common.comsumber.DefaultDispatcher;
 import io.microsphere.spring.common.comsumber.MessageReplSubscribableChannel;
-import io.microsphere.spring.db.event.DataUpdateEventListenerImpl;
 import io.microsphere.spring.db.message.consumber.messagehandler.DbReplMessageHandler;
 import io.microsphere.spring.db.spring.DataSourceWrapperBeanPostProcessor;
+import io.microsphere.spring.db.support.event.SqlSessionEventLlistenerImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,7 @@ public class DbreplicatorBeanDefinitionRegistrar implements ImportBeanDefinition
     @Override
     public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
         registerBeanDefinition(registry, DataSourceWrapperBeanPostProcessor.BEAN_NAME, DataSourceWrapperBeanPostProcessor.class);
-        registerBeanDefinition(registry, DataUpdateEventListenerImpl.BEAN_NAME, DataUpdateEventListenerImpl.class);
+        registerBeanDefinition(registry, "sqlSessionEventLlistener", SqlSessionEventLlistenerImpl.class);
         registerMessageHandlerBeanDefinition(registry);
 
     }
@@ -61,7 +61,7 @@ public class DbreplicatorBeanDefinitionRegistrar implements ImportBeanDefinition
     private void registerMessageHandler(BeanDefinitionRegistry registry, String beanNamePrefix) {
         String beanName = beanNamePrefix + MESSAGEHANDLER_NAME_PREFIX;
         BeanDefinitionBuilder beanDefinitionBuilder = genericBeanDefinition(DbReplMessageHandler.class);
-        beanDefinitionBuilder.addConstructorArgValue(getTopicPrefix(DB_REPLICATOR_TOPICPREFIX) + beanNamePrefix);
+        beanDefinitionBuilder.addConstructorArgValue(createTopic(environment,beanNamePrefix));
         registry.registerBeanDefinition(beanName, beanDefinitionBuilder.getBeanDefinition());
     }
 
@@ -69,7 +69,7 @@ public class DbreplicatorBeanDefinitionRegistrar implements ImportBeanDefinition
         String beanName2 = beanNamePrefix + MESSAGEREPLSUBSCRIBABLECHANNEL;
         BeanDefinitionBuilder beanDefinitionBuilder2 = genericBeanDefinition(MessageReplSubscribableChannel.class);
         beanDefinitionBuilder2.addConstructorArgValue(new DefaultDispatcher());
-        beanDefinitionBuilder2.addConstructorArgValue(getTopicPrefix(DB_REPLICATOR_TOPICPREFIX) + beanNamePrefix);
+        beanDefinitionBuilder2.addConstructorArgValue(createTopic(environment,beanNamePrefix));
         beanDefinitionBuilder2.addConstructorArgValue(beanNamePrefix + DB_REPLICATOR_TOPICPREFIX_DEFAULT+"group");
         registry.registerBeanDefinition(beanName2, beanDefinitionBuilder2.getBeanDefinition());
     }

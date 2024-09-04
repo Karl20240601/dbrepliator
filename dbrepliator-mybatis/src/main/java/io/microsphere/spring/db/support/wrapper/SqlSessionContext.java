@@ -1,39 +1,35 @@
 package io.microsphere.spring.db.support.wrapper;
 
 
+import org.springframework.util.CollectionUtils;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SqlSessionContext implements Serializable {
-    private List<StatementParamer> tatementParamers;
+    private static final long serialVersionUID = 5436603508567014260L;
+    private  List<StatementParamer> statementParamers = new ArrayList<>();
     private boolean autoCommit;
     private String sqlSessionFactorybeanName;
     private Object [] sqlSessionContructvalues;
-
-    public SqlSessionContext(List<StatementParamer> tatementParamers, boolean autoCommit, String sqlSessionFactorybeanName) {
-        this.tatementParamers = tatementParamers;
-        this.autoCommit = autoCommit;
-        this.sqlSessionFactorybeanName = sqlSessionFactorybeanName;
-    }
 
     public SqlSessionContext() {
     }
 
     public void addStatementParamer(StatementParamer statementParamer) {
-        if (tatementParamers == null) {
-            tatementParamers = new ArrayList<>();
+        statementParamers.add(statementParamer);
+    }
+
+    public List<StatementParamer> getStatementParamers() {
+        return statementParamers;
+    }
+
+    public void setStatementParamers(List<StatementParamer> statementParamers) {
+        if(CollectionUtils.isEmpty(statementParamers)){
+            return;
         }
-        tatementParamers.add(statementParamer);
-    }
-
-
-    public List<StatementParamer> getTatementParamers() {
-        return tatementParamers;
-    }
-
-    public void setTatementParamers(List<StatementParamer> tatementParamers) {
-        this.tatementParamers = tatementParamers;
+        this.statementParamers.addAll(statementParamers);
     }
 
     public boolean isAutoCommit() {

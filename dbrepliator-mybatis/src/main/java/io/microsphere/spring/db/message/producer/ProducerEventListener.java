@@ -13,12 +13,15 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.event.SmartApplicationListener;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -58,28 +61,28 @@ public class ProducerEventListener implements SmartApplicationListener, Applicat
     private void sendRedisReplicatorMessage(String domain, DbDataUpdateEvent event) {
         byte[] key = serialize(event.getMessageKey());
         byte[] value = serialize(event);
-        Message<byte[]> message = MessageBuilder
-                .withPayload(value)
-                .setHeader("messageKey", key)
-                .setHeader("timestamp", event.getTimestamp())
-                .build();
+        Map<String, Object> headerTimestap = new HashMap<>();
+        headerTimestap.put("messageKey", key);
+        headerTimestap.put("timestamp", event.getTimestamp());
+        MessageHeaders messageHeaders = new MessageHeaders(headerTimestap);
+        Message<byte[]> message = MessageBuilder.createMessage(value, messageHeaders);
         messageConfiguration.getMessageChannel(domain).send(message);
     }
 
-
-    private String createTopic(String domain) {
-        return dbReplicatorConfiguration.keyPrefix() + domain;
-    }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
         this.dbReplicatorConfiguration = applicationContext.getBean(DBReplicatorConfiguration.class);
         this.messageConfiguration = applicationContext.getBean(MessageConfiguration.class);
+        initExecutor();
     }
 
     private byte[] serialize(Object o) {
         try {
+            if (o == null) {
+                return null;
+            }
             Serialization serialization = dbReplicatorConfiguration.getSerialization();
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ObjectOutput serialize = serialization.serialize(byteArrayOutputStream);
@@ -87,7 +90,7 @@ public class ProducerEventListener implements SmartApplicationListener, Applicat
             serialize.flushBuffer();
             return byteArrayOutputStream.toByteArray();
         } catch (IOException e) {
-            logger.error("serizal fail");
+            logger.error("serizal fail", e);
             throw new RuntimeException(e);
         }
     }

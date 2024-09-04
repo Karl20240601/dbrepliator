@@ -40,7 +40,7 @@ public class DbReplSqlSession extends AbstractListenUpdateAbleSqlSession {
 
     @Override
     public int update(String statement, Object parameter) {
-        int update = getSqlSessionDelegate().update(statement);
+        int update = getSqlSessionDelegate().update(statement,parameter);
         listening(statement, parameter);
         return update;
     }

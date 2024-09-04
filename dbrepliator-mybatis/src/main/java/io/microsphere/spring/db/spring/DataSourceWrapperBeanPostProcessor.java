@@ -1,11 +1,12 @@
 package io.microsphere.spring.db.spring;
 
 
-import io.microsphere.spring.db.beans.DataSourceWrapper;
 import io.microsphere.spring.db.config.DBReplicatorConfiguration;
-import org.apache.ibatis.session.Configuration;
+import io.microsphere.spring.db.support.event.SqlSessionEventLlistener;
+import io.microsphere.spring.db.support.wrapper.SqlSessionFactoryWrapper;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -31,14 +32,16 @@ public class DataSourceWrapperBeanPostProcessor implements BeanPostProcessor, Ap
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        SqlSessionFactory bean1 = configurableApplicationContext.getBean(SqlSessionFactory.class);
-        Configuration configuration = bean1.getConfiguration();
-        configuration.getMappedStatements();
         DBReplicatorConfiguration dbReplicatorConfiguration = configurableApplicationContext.getBean(DBReplicatorConfiguration.class);
+        SqlSessionEventLlistener sqlSessionEventLlistener = configurableApplicationContext.getBean(SqlSessionEventLlistener.class);
         Set<String> syncEnableDataSources = dbReplicatorConfiguration.getSyncEnableDataSources();
-        if((CollectionUtils.isEmpty(syncEnableDataSources)||syncEnableDataSources.contains(beanName))&& DataSource.class.isAssignableFrom(bean.getClass())){
-            return new DataSourceWrapper((DataSource)bean,dbReplicatorConfiguration);
+        if((!CollectionUtils.isEmpty(syncEnableDataSources)&&syncEnableDataSources.contains(beanName)))
+        {
+            if(SqlSessionFactory.class.isAssignableFrom(bean.getClass())){
+                return new SqlSessionFactoryWrapper((SqlSessionFactory) bean,sqlSessionEventLlistener,beanName);
+            }
         }
+
         return bean;
     }
 }
