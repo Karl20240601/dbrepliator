@@ -7,13 +7,11 @@ import org.apache.ibatis.session.SqlSession;
 
 public class DbReplSqlSession extends AbstractListenUpdateAbleSqlSession {
     private final boolean autoCommit;
-    private final String beanName;
     private final SqlSessionEventLlistener sqlSessionEventLlistener;
 
 
-    public DbReplSqlSession(SqlSession sqlSession, String beanName, SqlSessionEventLlistener sqlSessionEventLlistener, boolean autoCommit) {
+    public DbReplSqlSession(SqlSession sqlSession, SqlSessionEventLlistener sqlSessionEventLlistener, boolean autoCommit) {
         super(sqlSession);
-        this.beanName = beanName;
         this.autoCommit = autoCommit;
         this.sqlSessionEventLlistener = sqlSessionEventLlistener;
     }
@@ -33,49 +31,60 @@ public class DbReplSqlSession extends AbstractListenUpdateAbleSqlSession {
         StatementParamer statementParamer = StatementParamerFactory.create(statement, parameter);
         statementParamer.setStatement(statement);
         SqlSessionContextHodler.add(statementParamer);
-        if (autoCommit) {
+        if (isAutoCommit()) {
             sqlSessionEventLlistener.onUpdate(SqlSessionContextHodler.getSqlSessionContext());
         }
     }
 
     @Override
     public int update(String statement, Object parameter) {
-        int update = getSqlSessionDelegate().update(statement,parameter);
+        int update = getSqlSessionDelegate().update(statement, parameter);
         listening(statement, parameter);
         return update;
     }
 
     @Override
     public void commit() {
-        getSqlSessionDelegate().commit();
-        sqlSessionEventLlistener.onCommit(SqlSessionContextHodler.getSqlSessionContext());
+        try {
+            getSqlSessionDelegate().commit();
+            sqlSessionEventLlistener.onCommit(SqlSessionContextHodler.getSqlSessionContext());
+        } finally {
+            SqlSessionContextHodler.reset();
+        }
     }
 
     @Override
     public void commit(boolean force) {
-        getSqlSessionDelegate().commit(force);
-        sqlSessionEventLlistener.onCommit(SqlSessionContextHodler.getSqlSessionContext());
+        try {
+            getSqlSessionDelegate().commit(force);
+            sqlSessionEventLlistener.onCommit(SqlSessionContextHodler.getSqlSessionContext());
+        } finally {
+            SqlSessionContextHodler.reset();
+        }
     }
 
     @Override
     public void rollback() {
-        sqlSessionEventLlistener.onRollback(SqlSessionContextHodler.getSqlSessionContext());
-
+        try {
+            getSqlSessionDelegate().rollback();
+        } finally {
+            SqlSessionContextHodler.reset();
+        }
     }
 
     @Override
     public void rollback(boolean force) {
-        getSqlSessionDelegate().commit(force);
-        sqlSessionEventLlistener.onRollback(SqlSessionContextHodler.getSqlSessionContext());
+        try {
+            getSqlSessionDelegate().rollback(force);
+        } finally {
+            SqlSessionContextHodler.reset();
+        }
     }
 
     public boolean isAutoCommit() {
         return autoCommit;
     }
 
-    public String getBeanName() {
-        return beanName;
-    }
 
     @Override
     public void close() {

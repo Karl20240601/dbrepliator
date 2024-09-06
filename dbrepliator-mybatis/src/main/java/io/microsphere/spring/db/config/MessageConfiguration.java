@@ -13,29 +13,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MessageConfiguration implements SmartApplicationListener {
+public class MessageConfiguration {
+
+    public final static String BEAN_NAME = "dbReplicatorMessageConfiguration";
+
+
+    public final static String DB_REPLICATOR_MESSAGE_PREFIX = "db.replicator.message";
+    public final static String DB_REPLICATOR_TOPICPREFIX = DB_REPLICATOR_MESSAGE_PREFIX + "topic-prefix";
+    public final static String DB_REPLICATOR_TOPICPREFIX_DEFAULT = "db-synchronize-message-topic";
+
+    public final static String MESSAGEHANDLER_NAME_PREFIX = "messageHandler";
+    public final static String MESSAGEREPLSUBSCRIBABLECHANNEL = "messageReplSubscribableChannel";
+
+
     private Map<String, MessageChannel> messageChannelDomianMap = new HashMap<>();
 
-    @Override
-    public boolean supportsEventType(Class<? extends ApplicationEvent> eventType) {
-        return ContextRefreshedEvent.class.equals(eventType);
-    }
-
-    @Override
-    public void onApplicationEvent(ApplicationEvent event) {
-        if (event instanceof ContextRefreshedEvent) {
-            onContextRefreshedEvent((ContextRefreshedEvent) event);
-        }
-    }
-
-    private void onContextRefreshedEvent(ContextRefreshedEvent event) {
-        ApplicationContext context = event.getApplicationContext();
-        DBReplicatorConfiguration dbReplicatorConfiguration = context.getBean(DBReplicatorConfiguration.class);
-        dbReplicatorConfiguration.init();
+    public void init(ApplicationContext context, DbReplConfiguration dbReplicatorConfiguration) {
         initMessageChannel(context, dbReplicatorConfiguration);
     }
 
-    private void initMessageChannel(ApplicationContext context, DBReplicatorConfiguration dbReplicatorConfiguration) {
+    private void initMessageChannel(ApplicationContext context, DbReplConfiguration dbReplicatorConfiguration) {
         Environment environment = context.getEnvironment();
         Boolean producerEnable = environment.getProperty(MessagePropertysConfiguration.PRODUCER_PROPERTY_ENABLE, boolean.class, false);
         if (!producerEnable) {
@@ -44,13 +41,19 @@ public class MessageConfiguration implements SmartApplicationListener {
         MessageChannelFactory bean = context.getBean(MessageChannelFactory.class);
         List<String> domains = dbReplicatorConfiguration.getDomains();
         for (String domain : domains) {
-            MessageChannel messageChannel = bean.createMessageChannel(dbReplicatorConfiguration.createTopic(domain));
+            MessageChannel messageChannel = bean.createMessageChannel(createTopic(context.getEnvironment(), domain));
             messageChannelDomianMap.put(domain, messageChannel);
         }
     }
 
     public MessageChannel getMessageChannel(String domain) {
         return messageChannelDomianMap.get(domain);
+    }
+
+
+    public static String createTopic(Environment environment, String domain) {
+        String property = environment.getProperty(DB_REPLICATOR_TOPICPREFIX, DB_REPLICATOR_TOPICPREFIX_DEFAULT);
+        return property + domain;
     }
 
 

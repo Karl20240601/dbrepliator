@@ -10,8 +10,6 @@ public class DbDataUpdateEvent extends ApplicationEvent implements Serializable 
     private static final long serialVersionUID = -7626394850479581275L;
     private SqlSessionContext sqlSessionContext;
     private String messageKey= UUID.randomUUID().toString();
-    private boolean autoCommit;
-    private Boolean commitForce;
 
     public DbDataUpdateEvent(Object source) {
         super(source);
@@ -43,19 +41,4 @@ public class DbDataUpdateEvent extends ApplicationEvent implements Serializable 
         this.messageKey = messageKey;
     }
 
-    public boolean isAutoCommit() {
-        return autoCommit;
-    }
-
-    public void setAutoCommit(boolean autoCommit) {
-        this.autoCommit = autoCommit;
-    }
-
-    public Boolean getCommitForce() {
-        return commitForce;
-    }
-
-    public void setCommitForce(Boolean commitForce) {
-        this.commitForce = commitForce;
-    }
 }

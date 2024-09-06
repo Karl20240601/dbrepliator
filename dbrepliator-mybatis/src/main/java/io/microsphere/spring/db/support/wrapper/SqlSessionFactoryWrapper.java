@@ -1,5 +1,6 @@
 package io.microsphere.spring.db.support.wrapper;
 
+import io.microsphere.spring.db.config.MybatisContext;
 import io.microsphere.spring.db.support.event.SqlSessionEventLlistener;
 import org.apache.ibatis.session.*;
 
@@ -8,41 +9,49 @@ import java.sql.SQLException;
 
 public class SqlSessionFactoryWrapper implements SqlSessionFactory {
     private final SqlSessionFactory sqlSessionFactory;
-    private final SqlSessionEventLlistener sqlSessionEventLlistener;
     private final String sqlSessionFactorybeanName;
+    private final MybatisContext mybatisContext;
 
-
-    public SqlSessionFactoryWrapper(SqlSessionFactory sqlSessionFactory, SqlSessionEventLlistener sqlSessionEventLlistener, String sqlSessionFactorybeanName) {
+    public SqlSessionFactoryWrapper(SqlSessionFactory sqlSessionFactory, MybatisContext mybatisContext, String sqlSessionFactorybeanName) {
         this.sqlSessionFactory = sqlSessionFactory;
         this.sqlSessionFactorybeanName = sqlSessionFactorybeanName;
-        this.sqlSessionEventLlistener = sqlSessionEventLlistener;
+        this.mybatisContext = mybatisContext;
     }
 
     @Override
     public SqlSession openSession() {
-        SqlSessionContextHodler.init(sqlSessionFactorybeanName, null, false);
-
         SqlSession sqlSession = sqlSessionFactory.openSession();
-        return new DbReplSqlSession(sqlSession, this.sqlSessionFactorybeanName, sqlSessionEventLlistener, false);
+        if (!mybatisContext.isEnable()) {
+            return sqlSession;
+        }
+        SqlSessionContextHodler.init(sqlSessionFactorybeanName, null, false);
+        return new DbReplSqlSession(sqlSession, mybatisContext.getSqlSessionEventLlistener(), false);
     }
 
     @Override
     public SqlSession openSession(boolean autoCommit) {
-        Object[] values = {autoCommit};
-        SqlSessionContextHodler.init(sqlSessionFactorybeanName, values, autoCommit);
+
 
         SqlSession sqlSession = sqlSessionFactory.openSession(autoCommit);
-        return new DbReplSqlSession(sqlSession, this.sqlSessionFactorybeanName, sqlSessionEventLlistener, autoCommit);
+        if (!mybatisContext.isEnable()) {
+            return sqlSession;
+        }
+        Object[] values = {autoCommit};
+        SqlSessionContextHodler.init(sqlSessionFactorybeanName, values, autoCommit);
+        return new DbReplSqlSession(sqlSession, mybatisContext.getSqlSessionEventLlistener(), autoCommit);
     }
 
     @Override
     public SqlSession openSession(Connection connection) {
+        SqlSession sqlSession = sqlSessionFactory.openSession(connection);
+        if (!mybatisContext.isEnable()) {
+            return sqlSession;
+        }
+
         Object[] values = {Connection.class};
         boolean autoCommit = getAutoCommit(connection);
         SqlSessionContextHodler.init(sqlSessionFactorybeanName, values, autoCommit);
-
-        SqlSession sqlSession = sqlSessionFactory.openSession(connection);
-        return new DbReplSqlSession(sqlSession, this.sqlSessionFactorybeanName, sqlSessionEventLlistener, autoCommit);
+        return new DbReplSqlSession(sqlSession, mybatisContext.getSqlSessionEventLlistener(), autoCommit);
     }
 
     private boolean getAutoCommit(Connection connection) {
@@ -59,45 +68,62 @@ public class SqlSessionFactoryWrapper implements SqlSessionFactory {
 
     @Override
     public SqlSession openSession(TransactionIsolationLevel level) {
+        SqlSession sqlSession = sqlSessionFactory.openSession(level);
+        if (!mybatisContext.isEnable()) {
+            return sqlSession;
+        }
+
         Object[] values = {level};
         SqlSessionContextHodler.init(sqlSessionFactorybeanName, values, false);
-        SqlSession sqlSession = sqlSessionFactory.openSession(level);
-        return new DbReplSqlSession(sqlSession, this.sqlSessionFactorybeanName, sqlSessionEventLlistener, false);
+        return new DbReplSqlSession(sqlSession, mybatisContext.getSqlSessionEventLlistener(), false);
     }
 
     @Override
     public SqlSession openSession(ExecutorType execType) {
+        SqlSession sqlSession = sqlSessionFactory.openSession(execType);
+        if (!mybatisContext.isEnable()) {
+            return sqlSession;
+        }
+
         Object[] values = {execType};
         SqlSessionContextHodler.init(sqlSessionFactorybeanName, values, false);
-        SqlSession sqlSession = sqlSessionFactory.openSession(execType);
-        return new DbReplSqlSession(sqlSession, this.sqlSessionFactorybeanName, sqlSessionEventLlistener, false);
+        return new DbReplSqlSession(sqlSession, mybatisContext.getSqlSessionEventLlistener(), false);
     }
 
     @Override
     public SqlSession openSession(ExecutorType execType, boolean autoCommit) {
-        Object[] values = {execType};
-        SqlSessionContextHodler.init(sqlSessionFactorybeanName, values, autoCommit);
-
         SqlSession sqlSession = sqlSessionFactory.openSession(execType);
-        return new DbReplSqlSession(sqlSession, this.sqlSessionFactorybeanName, sqlSessionEventLlistener, autoCommit);
+        if (!mybatisContext.isEnable()) {
+            return sqlSession;
+        }
+
+        Object[] values = {execType,autoCommit};
+        SqlSessionContextHodler.init(sqlSessionFactorybeanName, values, autoCommit);
+        return new DbReplSqlSession(sqlSession, mybatisContext.getSqlSessionEventLlistener(), autoCommit);
     }
 
     @Override
     public SqlSession openSession(ExecutorType execType, TransactionIsolationLevel level) {
+        SqlSession sqlSession = sqlSessionFactory.openSession(execType, level);
+        if (!mybatisContext.isEnable()) {
+            return sqlSession;
+        }
+
         Object[] values = {execType, level};
         SqlSessionContextHodler.init(sqlSessionFactorybeanName, values, false);
-
-        SqlSession sqlSession = sqlSessionFactory.openSession(execType, level);
-        return new DbReplSqlSession(sqlSession, this.sqlSessionFactorybeanName, sqlSessionEventLlistener, false);
+        return new DbReplSqlSession(sqlSession, mybatisContext.getSqlSessionEventLlistener(), false);
     }
 
     @Override
     public SqlSession openSession(ExecutorType execType, Connection connection) {
+        SqlSession sqlSession = sqlSessionFactory.openSession(execType, connection);
+        if (!mybatisContext.isEnable()) {
+            return sqlSession;
+        }
+
         Object[] values = {execType, Connection.class};
         SqlSessionContextHodler.init(sqlSessionFactorybeanName, values, getAutoCommit(connection));
-
-        SqlSession sqlSession = sqlSessionFactory.openSession(execType, connection);
-        return new DbReplSqlSession(sqlSession, this.sqlSessionFactorybeanName, sqlSessionEventLlistener, getAutoCommit(connection));
+        return new DbReplSqlSession(sqlSession, mybatisContext.getSqlSessionEventLlistener(), getAutoCommit(connection));
     }
 
     @Override

@@ -6,6 +6,8 @@ import org.springframework.context.ApplicationEventPublisherAware;
 
 public class SqlSessionEventLlistenerImpl implements SqlSessionEventLlistener, ApplicationEventPublisherAware {
     private ApplicationEventPublisher applicationEventPublisher;
+    public final static String BEAN_NAME = "sqlSessionEventLlistenerImpl";
+
 
     @Override
     public void onUpdate(SqlSessionContext sqlSessionContext) {
@@ -22,13 +24,10 @@ public class SqlSessionEventLlistenerImpl implements SqlSessionEventLlistener, A
         publishEvent(sqlSessionContext);
     }
 
-    @Override
-    public void onRollback(SqlSessionContext sqlSessionContext) {
-        publishEvent(sqlSessionContext);
-    }
 
     private DbDataUpdateEvent createDbDataUpdateEvent(SqlSessionContext sqlSessionContext) {
         DbDataUpdateEvent dbDataUpdateEvent = new DbDataUpdateEvent(sqlSessionContext);
+        dbDataUpdateEvent.setMessageKey(Long.toString(dbDataUpdateEvent.getTimestamp()));
         dbDataUpdateEvent.setSqlSessionContext(sqlSessionContext);
         return dbDataUpdateEvent;
     }

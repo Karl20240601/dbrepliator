@@ -1,13 +1,13 @@
 package io.microsphere.spring.db.message.producer;
 
-import io.microsphere.spring.db.config.DBReplicatorConfiguration;
-import io.microsphere.spring.db.config.MessageConfiguration;
+import io.microsphere.spring.db.config.MybatisContext;
 import io.microsphere.spring.db.serialize.api.ObjectOutput;
 import io.microsphere.spring.db.serialize.api.Serialization;
 import io.microsphere.spring.db.support.event.DbDataUpdateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEvent;
@@ -25,13 +25,12 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ProducerEventListener implements SmartApplicationListener, ApplicationContextAware {
+public class ProducerEventListener implements SmartApplicationListener, ApplicationContextAware, SmartInitializingSingleton {
     private static final Logger logger = LoggerFactory.getLogger(ProducerEventListener.class);
 
     private ApplicationContext applicationContext;
     private ExecutorService executor;
-    private DBReplicatorConfiguration dbReplicatorConfiguration;
-    private MessageConfiguration messageConfiguration;
+    private MybatisContext mybatisContext;
 
     @Override
     public boolean supportsEventType(Class<? extends ApplicationEvent> eventType) {
@@ -42,7 +41,7 @@ public class ProducerEventListener implements SmartApplicationListener, Applicat
     public void onApplicationEvent(ApplicationEvent event) {
         DbDataUpdateEvent dbDataExecuteUpdateEvent = (DbDataUpdateEvent) event;
         try {
-            List<String> domains = dbReplicatorConfiguration.getDomains(dbDataExecuteUpdateEvent.getBeanName());
+            List<String> domains = mybatisContext.getDbReplConfiguration().getDomains();
             for (String domain : domains) {
                 executor.execute(() -> sendRedisReplicatorMessage(domain, dbDataExecuteUpdateEvent));
             }
@@ -52,7 +51,7 @@ public class ProducerEventListener implements SmartApplicationListener, Applicat
     }
 
     private void initExecutor() {
-        List<String> domains = dbReplicatorConfiguration.getDomains();
+        List<String> domains = mybatisContext.getDbReplConfiguration().getDomains();
         int size = domains.size();
         this.executor = Executors.newFixedThreadPool(size, new CustomizableThreadFactory(domains.toString()));
     }
@@ -66,16 +65,13 @@ public class ProducerEventListener implements SmartApplicationListener, Applicat
         headerTimestap.put("timestamp", event.getTimestamp());
         MessageHeaders messageHeaders = new MessageHeaders(headerTimestap);
         Message<byte[]> message = MessageBuilder.createMessage(value, messageHeaders);
-        messageConfiguration.getMessageChannel(domain).send(message);
+        mybatisContext.getMessageConfiguration().getMessageChannel(domain).send(message);
     }
 
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
-        this.dbReplicatorConfiguration = applicationContext.getBean(DBReplicatorConfiguration.class);
-        this.messageConfiguration = applicationContext.getBean(MessageConfiguration.class);
-        initExecutor();
     }
 
     private byte[] serialize(Object o) {
@@ -83,7 +79,7 @@ public class ProducerEventListener implements SmartApplicationListener, Applicat
             if (o == null) {
                 return null;
             }
-            Serialization serialization = dbReplicatorConfiguration.getSerialization();
+            Serialization serialization = this.mybatisContext.getSerialization();
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ObjectOutput serialize = serialization.serialize(byteArrayOutputStream);
             serialize.writeObject(o);
@@ -93,5 +89,11 @@ public class ProducerEventListener implements SmartApplicationListener, Applicat
             logger.error("serizal fail", e);
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void afterSingletonsInstantiated() {
+        this.mybatisContext = applicationContext.getBean(MybatisContext.class);
+        initExecutor();
     }
 }

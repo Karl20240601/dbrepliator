@@ -2,7 +2,7 @@ package io.microsphere.spring.db.message.consumber.messagehandler;
 
 import com.alibaba.fastjson.JSONObject;
 import io.microsphere.spring.common.comsumber.ReplMessageHandler;
-import io.microsphere.spring.db.config.DBReplicatorConfiguration;
+import io.microsphere.spring.db.config.MybatisContext;
 import io.microsphere.spring.db.serialize.api.ObjectInput;
 import io.microsphere.spring.db.support.event.DbDataUpdateEvent;
 import io.microsphere.spring.db.support.wrapper.SqlSessionContext;
@@ -32,7 +32,7 @@ import static java.util.Collections.unmodifiableMap;
 public class DbReplMessageHandler implements ReplMessageHandler, ApplicationContextAware, SmartInitializingSingleton {
     private final String inputChannel;
     private ApplicationContext applicationContext;
-    private DBReplicatorConfiguration dbReplicatorConfiguration;
+    private MybatisContext mybatisContext;
     private static final Logger logger = LoggerFactory.getLogger(DbReplMessageHandler.class);
     private final Map<SqlSessionMethodKey, BiFunction<SqlSessionFactory, Object[], SqlSession>> redisCommandBindings = initSqlSessionBindings();
 
@@ -69,7 +69,7 @@ public class DbReplMessageHandler implements ReplMessageHandler, ApplicationCont
 
     private void processDbupdateEvent(byte[] bytes) throws Exception {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
-        ObjectInput deserialize = dbReplicatorConfiguration.getSerialization().deserialize(byteArrayInputStream);
+        ObjectInput deserialize = mybatisContext.getSerialization().deserialize(byteArrayInputStream);
 
         DbDataUpdateEvent dbDataUpdateEvent = deserialize.readObject(DbDataUpdateEvent.class);
         logger.debug("receive data {}", JSONObject.toJSONString(dbDataUpdateEvent));
@@ -87,7 +87,7 @@ public class DbReplMessageHandler implements ReplMessageHandler, ApplicationCont
     }
 
     private SqlSession getSqlSession(SqlSessionContext sqlSessionContext) {
-        SqlSessionFactory sqlSessionFactory = dbReplicatorConfiguration.getSqlSessionFactory(sqlSessionContext.getSqlSessionFactorybeanName());
+        SqlSessionFactory sqlSessionFactory = mybatisContext.getSqlSessionFactory(sqlSessionContext.getSqlSessionFactorybeanName());
         Object[] sqlSessionContructvalues = sqlSessionContext.getSqlSessionContructvalues();
         Object[] sqlSessionContructvalues1 = getSqlSessionContructvalues(sqlSessionContructvalues);
         Class<?>[] sqlSessionContructTypes = getSqlSessionContructTypes(sqlSessionContructvalues);
@@ -161,6 +161,6 @@ public class DbReplMessageHandler implements ReplMessageHandler, ApplicationCont
 
     @Override
     public void afterSingletonsInstantiated() {
-        this.dbReplicatorConfiguration = applicationContext.getBean(DBReplicatorConfiguration.class);
+        this.mybatisContext = applicationContext.getBean(MybatisContext.class);
     }
 }

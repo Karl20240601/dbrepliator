@@ -1,7 +1,11 @@
 package io.microsphere.spring.db.annotation;
 
+import io.microsphere.spring.common.MessagePropertysConfiguration;
 import io.microsphere.spring.common.comsumber.DefaultDispatcher;
 import io.microsphere.spring.common.comsumber.MessageReplSubscribableChannel;
+import io.microsphere.spring.db.config.DbReplConfiguration;
+import io.microsphere.spring.db.config.MessageConfiguration;
+import io.microsphere.spring.db.config.MybatisContext;
 import io.microsphere.spring.db.message.consumber.messagehandler.DbReplMessageHandler;
 import io.microsphere.spring.db.spring.DataSourceWrapperBeanPostProcessor;
 import io.microsphere.spring.db.support.event.SqlSessionEventLlistenerImpl;
@@ -17,7 +21,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.Assert;
 
-import static io.microsphere.spring.db.config.DBReplicatorConfiguration.*;
+import static io.microsphere.spring.db.config.DbReplConfiguration.DB_REPLICATOR_DOMAIN;
+import static io.microsphere.spring.db.config.MessageConfiguration.*;
 import static java.util.Arrays.asList;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
@@ -28,7 +33,10 @@ public class DbreplicatorBeanDefinitionRegistrar implements ImportBeanDefinition
     @Override
     public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
         registerBeanDefinition(registry, DataSourceWrapperBeanPostProcessor.BEAN_NAME, DataSourceWrapperBeanPostProcessor.class);
-        registerBeanDefinition(registry, "sqlSessionEventLlistener", SqlSessionEventLlistenerImpl.class);
+        registerBeanDefinition(registry, SqlSessionEventLlistenerImpl.BEAN_NAME, SqlSessionEventLlistenerImpl.class);
+        registerBeanDefinition(registry, MybatisContext.BEAN_NAME, MybatisContext.class);
+        registerBeanDefinition(registry, DbReplConfiguration.BEAN_NAME, DbReplConfiguration.class);
+        registerBeanDefinition(registry, MessageConfiguration.BEAN_NAME, MessageConfiguration.class);
         registerMessageHandlerBeanDefinition(registry);
 
     }
@@ -46,41 +54,34 @@ public class DbreplicatorBeanDefinitionRegistrar implements ImportBeanDefinition
     }
 
     private void registerMessageHandlerBeanDefinition(BeanDefinitionRegistry registry) {
-        String property = environment.getProperty(DB_REPLICATOR_DOMAINS);
-        if (StringUtils.isBlank(property)) {
-            logger.debug("property '{}' not config",DB_REPLICATOR_DOMAINS);
+        registerComsumber(registry);
+    }
+
+    private void registerComsumber(BeanDefinitionRegistry registry) {
+        boolean consumerPropertyEnable = environment.getProperty(MessagePropertysConfiguration.CONSUMER_PROPERTY_ENABLE, boolean.class,false);
+        if (!consumerPropertyEnable) {
+            logger.debug("property '{}' not config, comsumber not enable", MessagePropertysConfiguration.CONSUMER_PROPERTY_ENABLE);
             return;
         }
-        String[] split = StringUtils.split(property, ",");
-        for (String beanNamePrefix : split) {
-            registerMessageHandler(registry, beanNamePrefix);
-            registerSubcriberChannel(registry, beanNamePrefix);
-        }
+        String domain = environment.getProperty(DB_REPLICATOR_DOMAIN);
+        registerMessageHandler(registry, domain);
+        registerSubcriberChannel(registry, domain);
     }
 
-    private void registerMessageHandler(BeanDefinitionRegistry registry, String beanNamePrefix) {
-        String beanName = beanNamePrefix + MESSAGEHANDLER_NAME_PREFIX;
-        BeanDefinitionBuilder beanDefinitionBuilder = genericBeanDefinition(DbReplMessageHandler.class);
-        beanDefinitionBuilder.addConstructorArgValue(createTopic(environment,beanNamePrefix));
-        registry.registerBeanDefinition(beanName, beanDefinitionBuilder.getBeanDefinition());
+    private void registerMessageHandler(BeanDefinitionRegistry registry, String domain) {
+        String beanName = domain + MESSAGEHANDLER_NAME_PREFIX;
+        registerBeanDefinition(registry, beanName, DbReplMessageHandler.class, createTopic(environment, domain));
     }
 
-    private void registerSubcriberChannel(BeanDefinitionRegistry registry, String beanNamePrefix) {
-        String beanName2 = beanNamePrefix + MESSAGEREPLSUBSCRIBABLECHANNEL;
-        BeanDefinitionBuilder beanDefinitionBuilder2 = genericBeanDefinition(MessageReplSubscribableChannel.class);
-        beanDefinitionBuilder2.addConstructorArgValue(new DefaultDispatcher());
-        beanDefinitionBuilder2.addConstructorArgValue(createTopic(environment,beanNamePrefix));
-        beanDefinitionBuilder2.addConstructorArgValue(beanNamePrefix + DB_REPLICATOR_TOPICPREFIX_DEFAULT+"group");
-        registry.registerBeanDefinition(beanName2, beanDefinitionBuilder2.getBeanDefinition());
+    private void registerSubcriberChannel(BeanDefinitionRegistry registry, String domain) {
+        String beanName = domain + MESSAGEREPLSUBSCRIBABLECHANNEL;
+        registerBeanDefinition(registry, beanName, MessageReplSubscribableChannel.class, new DefaultDispatcher(),
+                createTopic(environment, domain), DB_REPLICATOR_TOPICPREFIX_DEFAULT + domain + "group");
     }
 
     @Override
     public void setEnvironment(Environment environment) {
         Assert.isInstanceOf(ConfigurableEnvironment.class, environment);
         this.environment = (ConfigurableEnvironment) environment;
-    }
-
-    private String getTopicPrefix(String property){
-        return environment.getProperty(property,DB_REPLICATOR_TOPICPREFIX_DEFAULT);
     }
 }
