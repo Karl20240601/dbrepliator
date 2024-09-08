@@ -20,7 +20,7 @@ public class MessagePropertysConfiguration {
     public static final String PRODUCER_PROPERTY_NAME_PREFIX = PROPERTY_NAME_PREFIX + "producer.";
     public static final String CONSUMER_PROPERTY_NAME_PREFIX = PROPERTY_NAME_PREFIX + "consumer.";
     public static final String PRODUCER_PROPERTY_ENABLE = PRODUCER_PROPERTY_NAME_PREFIX + "enable";
-    public static final String CONSUMER_PROPERTY_ENABLE = PRODUCER_PROPERTY_NAME_PREFIX + "enable";
+    public static final String CONSUMER_PROPERTY_ENABLE = CONSUMER_PROPERTY_NAME_PREFIX + "enable";
 
 
 
