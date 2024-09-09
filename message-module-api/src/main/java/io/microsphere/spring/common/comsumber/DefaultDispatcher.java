@@ -12,7 +12,15 @@ public class DefaultDispatcher implements MessageDispatcher {
     @Override
     public void addMessageHandler(MessageHandler messageHandler) {
         messageHandlers.add(messageHandler);
+    }
 
+    @Override
+    public void addMessageHandlers(MessageHandler... messageHandlers) {
+        if (messageHandlers == null || messageHandlers.length <= 0) {
+            return;
+        }
+        for (MessageHandler messageHandler : messageHandlers)
+            this.messageHandlers.add(messageHandler);
     }
 
     @Override

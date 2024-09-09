@@ -23,30 +23,19 @@ import static java.util.Collections.unmodifiableMap;
 
 public class KafkaConsumerEndpoint extends AbstractConsumerEndpoint {
     private SubscribableChannel subscribableChannel;
-    private final Map<String, Object> mapProperties;
-    private final String[] topics;
-    private final String group;
-    private boolean running;
-    private ConsumerFactory<byte[], byte[]> kafkaConsumerFactory;
-    private ConcurrentMessageListenerContainer<byte[], byte[]> listenerContainer;
-    private BeanFactory beanFactory;
+    private final ConsumerFactory<byte[], byte[]> kafkaConsumerFactory;
+    private final ConcurrentMessageListenerContainer<byte[], byte[]> listenerContainer;
 
 
-    public KafkaConsumerEndpoint( BeanFactory beanFactory,Map<String, Object> mapProperties, String[] topics,String group) {
-        this.beanFactory = beanFactory;
-        this.mapProperties = unmodifiableMap(mapProperties);
-        this.topics = topics;
-        this.group = group;
-        this.kafkaConsumerFactory = createReplicatorConsumerFactory();
-        this.listenerContainer = createReplicatorConcurrentMessageListenerContainer();
+    public KafkaConsumerEndpoint(ConsumerFactory<byte[], byte[]> kafkaConsumerFactory,ConcurrentMessageListenerContainer<byte[], byte[]> listenerContainer) {
+        this.kafkaConsumerFactory = kafkaConsumerFactory;
+        this.listenerContainer = listenerContainer;
     }
 
     @Override
     public void setInputMessageChannel(SubscribableChannel subscribableChannel) {
         this.subscribableChannel = subscribableChannel;
-        start();
         listenerContainer.start();
-
     }
 
 
@@ -60,36 +49,7 @@ public class KafkaConsumerEndpoint extends AbstractConsumerEndpoint {
                 }
             }
         });
-        this.running = true;
     }
-
-
-
-    public ConcurrentMessageListenerContainer<byte[], byte[]> createReplicatorConcurrentMessageListenerContainer() {
-        String[] topics = getTopics();
-        ContainerProperties containerProperties = new ContainerProperties(topics);
-        this.listenerContainer = new ConcurrentMessageListenerContainer<>(this.kafkaConsumerFactory, containerProperties);
-        listenerContainer.setConcurrency(getConcurrency(topics));
-        return listenerContainer;
-    }
-
-    private String[] getTopics() {
-        return this.topics;
-    }
-
-    private int getConcurrency(String[] topics) {
-        int topicCount = topics.length;
-        //return topicCount > listenerConcurrency ? topicCount : listenerConcurrency;
-        return topicCount;
-    }
-
-    private ConsumerFactory<byte[], byte[]> createReplicatorConsumerFactory() {
-        DefaultKafkaConsumerFactory<byte[], byte[]> objectObjectDefaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(this.mapProperties);
-        objectObjectDefaultKafkaConsumerFactory.setKeyDeserializer(new ByteArrayDeserializer());
-        objectObjectDefaultKafkaConsumerFactory.setValueDeserializer(new ByteArrayDeserializer());
-        return objectObjectDefaultKafkaConsumerFactory;
-    }
-
 
 
     private List<Message<byte[]>> converMessageList(List<ConsumerRecord<byte[], byte[]>> data) {
@@ -102,4 +62,6 @@ public class KafkaConsumerEndpoint extends AbstractConsumerEndpoint {
         }
         return dataList;
     }
+
+
 }

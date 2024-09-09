@@ -5,6 +5,7 @@ import org.springframework.messaging.MessageHandler;
 
 public interface MessageDispatcher {
     void addMessageHandler(MessageHandler messageHandler);
+    void addMessageHandlers(MessageHandler... messageHandlers);
 
     void removeMessageHandler(MessageHandler messageHandler);
 
