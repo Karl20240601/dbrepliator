@@ -21,17 +21,20 @@ public class MessagePropertysConfiguration {
     public static final String CONSUMER_PROPERTY_NAME_PREFIX = PROPERTY_NAME_PREFIX + "consumer.";
     public static final String PRODUCER_PROPERTY_ENABLE = PRODUCER_PROPERTY_NAME_PREFIX + "enable";
     public static final String CONSUMER_PROPERTY_ENABLE = CONSUMER_PROPERTY_NAME_PREFIX + "enable";
+    public final static String KAFKA_CONFIG_PROPERTIES = "spring.kafka.bootstrap-servers";
+    public final static String RABBITMQ_CONFIG_PROPERTIES = "spring.kafka.bootstrap-servers";
+    public final static String TOPIC_CONFIG_PROPERTIES = "spring.kafka.bootstrap-servers";
 
 
 
 
-    public static Map<String, Object> initConsumerConfigs(ConfigurableEnvironment environment, String groupId) {
+    public static Map<String, Object> initConsumerConfigs(ConfigurableEnvironment environment) {
         Map<String, Object> consumerConfigs = new HashMap<>();
 
         // Kafka bootstrap servers
         consumerConfigs.put(BOOTSTRAP_SERVERS_CONFIG, getBootServerList(environment));
         // Kafka consumer group id
-        consumerConfigs.put(GROUP_ID_CONFIG, groupId);
+        //consumerConfigs.put(GROUP_ID_CONFIG, groupId);
 
         // Kafka Common properties
         consumerConfigs.putAll(getSubProperties(environment, PROPERTY_NAME_PREFIX));
@@ -41,7 +44,7 @@ public class MessagePropertysConfiguration {
         return consumerConfigs;
     }
 
-    public static Map<String, Object> initProducerConfigs(ConfigurableEnvironment environment, String groupId, List<String> brokerList) {
+    public static Map<String, Object> initProducerConfigs(ConfigurableEnvironment environment, List<String> brokerList) {
         Map<String, Object> consumerConfigs = new HashMap<>();
 
         // Kafka bootstrap servers

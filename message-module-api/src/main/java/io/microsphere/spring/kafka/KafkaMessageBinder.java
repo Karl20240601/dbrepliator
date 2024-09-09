@@ -17,6 +17,7 @@ import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.SmartLifecycle;
 import org.springframework.kafka.core.*;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.ContainerProperties;
@@ -117,10 +118,11 @@ public class KafkaMessageBinder extends AbstractMessageBinder implements Applica
         return new KafkaSendingHandler(kafkaTemplate, topic);
     }
 
-    static class KafkaSendingHandler implements SendingHandler {
+    static class KafkaSendingHandler implements SendingHandler, SmartLifecycle {
 
         private final KafkaTemplate kafkaTemplate;
         private final String topic;
+        private boolean running;
 
         public KafkaSendingHandler(KafkaTemplate kafkaTemplate, String topic) {
             this.kafkaTemplate = kafkaTemplate;
@@ -146,6 +148,21 @@ public class KafkaMessageBinder extends AbstractMessageBinder implements Applica
                 return false;
             }
             return true;
+        }
+
+        @Override
+        public void start() {
+            this.running = true;
+        }
+
+        @Override
+        public void stop() {
+            kafkaTemplate.getProducerFactory().reset();
+        }
+
+        @Override
+        public boolean isRunning() {
+            return running;
         }
     }
 

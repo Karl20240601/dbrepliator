@@ -16,18 +16,20 @@ public abstract class AbstractMessageBinder implements MessageBinder {
         this.messageTargetRegistry = messageTargetRegistry;
     }
 
-    public void bindConsumber(String inputName) {
+    public ConsumerEndpoint bindConsumber(String inputName) {
         ConsumerDestination consumerDestination = messageTargetRegistry.getConsumerDestination(inputName);
         ConsumerEndpoint consumerEndpoint = createConsumerEndpoint(consumerDestination);
         SubscribableChannel subscribableChannel = messageTargetRegistry.getSubscribableChannel(inputName);
         consumerEndpoint.setInputMessageChannel(subscribableChannel);
+        return consumerEndpoint;
     }
 
-    public void bindProducer(String outputName) {
+    public ProducerMessageChannel bindProducer(String outputName) {
         ProducerDestination producerDestination = messageTargetRegistry.getProducerDestination(outputName);
         SendingHandler sendingHandler = createProducerMessageHandler(producerDestination);
         ProducerMessageChannel producerMessageChannel = messageTargetRegistry.getProducerMessageChannel(outputName);
         producerMessageChannel.setSendingHandler(sendingHandler);
+        return producerMessageChannel;
     }
 
     protected abstract ConsumerEndpoint createConsumerEndpoint(ConsumerDestination consumerDestination);

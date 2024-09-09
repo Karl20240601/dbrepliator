@@ -1,12 +1,15 @@
 package io.microsphere.spring.common.binds;
 
+import io.microsphere.spring.common.comsumber.ConsumerEndpoint;
+import io.microsphere.spring.common.producer.ProducerMessageChannel;
+
 /**
  * MessageBinder
  *
  */
 public   interface MessageBinder {
-    void bindConsumber(String inputName);
+    ConsumerEndpoint bindConsumber(String inputName);
 
-    void bindProducer(String outputName);
+    ProducerMessageChannel bindProducer(String outputName);
 
 }
