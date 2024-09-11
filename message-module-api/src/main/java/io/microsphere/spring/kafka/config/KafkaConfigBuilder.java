@@ -59,18 +59,20 @@ public class KafkaConfigBuilder implements ConfigBuilder {
     private ConsumerDestination buildConsumerDestination(String domain, Environment environment) {
         String groupProperty = CONSUMER_TOPIC_CONFIG_DOMAIN_PROPERTIES + domain + GROUP_PROPERTY;
         String messageHandlerBeanNameProperty = CONSUMER_TOPIC_CONFIG_DOMAIN_PROPERTIES + domain + MESSAGEHANDLER_BEAN_NAME_PROPERTY;
-        String topicPrefixProperty = TOPIC_PREFIX_PROPERTY + domain + MESSAGEHANDLER_BEAN_NAME_PROPERTY;
         List<String> messageHandlerBeanNames = environment.getProperty(messageHandlerBeanNameProperty, List.class, Collections.emptyList());
         String group = environment.getProperty(groupProperty, String.class);
-        String topicPrefix = environment.getProperty(topicPrefixProperty, String.class);
+
+        String topicPrefixProperty =  PROPERTY_NAME_PREFIX+ domain + TOPIC_PREFIX_PROPERTY;
+        String topicPrefix = environment.getProperty(topicPrefixProperty, String.class,"");
+
         Map<String, Object> objectMap = initConsumerConfigs((ConfigurableEnvironment) environment);
         return new KafkaConsumerDestination(topicPrefix + domain, group,messageHandlerBeanNames, objectMap);
     }
 
 
     private ProducerDestination buildProducerDestination(String domain, Environment environment) {
-        String topicPrefixProperty = TOPIC_PREFIX_PROPERTY + domain + MESSAGEHANDLER_BEAN_NAME_PROPERTY;
-        String topicPrefix = environment.getProperty(topicPrefixProperty, String.class);
+        String topicPrefixProperty = PROPERTY_NAME_PREFIX + domain + TOPIC_PREFIX_PROPERTY;
+        String topicPrefix = environment.getProperty(topicPrefixProperty, String.class,"");
         Map<String, Object> objectMap = initProducerConfigs((ConfigurableEnvironment) environment);
         return new KafkaProducerDestination(topicPrefix + domain, objectMap);
     }
