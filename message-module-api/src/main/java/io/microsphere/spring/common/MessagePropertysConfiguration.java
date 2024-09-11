@@ -11,7 +11,6 @@ import java.util.Map;
 
 import static io.microsphere.spring.util.PropertySourcesUtils.getSubProperties;
 import static org.apache.kafka.clients.CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG;
-import static org.apache.kafka.clients.CommonClientConfigs.GROUP_ID_CONFIG;
 
 public class MessagePropertysConfiguration {
 
@@ -25,10 +24,10 @@ public class MessagePropertysConfiguration {
     public final static String TOPIC_CONFIG_PROPERTIES = "spring.kafka.bootstrap-servers";
     public final static String CONSUMER_TOPIC_CONFIG_DOMAIN_PROPERTIES = CONSUMER_PROPERTY_NAME_PREFIX + "domain.";
     public final static String PRODUCER_TOPIC_CONFIG_DOMAINS = PRODUCER_PROPERTY_NAME_PREFIX + "domains.";
-    public final static String PARTION_PROPERTY = "partion";
-    public final static String GROUP_PROPERTY = "group";
-    public final static String MESSAGEHANDLER_BEAN_NAME_PROPERTY = "messagehander";
-    public final static String TOPIC_PREFIX_PROPERTY = "topic.prefix";
+    public final static String PARTION_PROPERTY = ".partion";
+    public final static String GROUP_PROPERTY = ".group";
+    public final static String MESSAGEHANDLER_BEAN_NAME_PROPERTY = ".messagehander";
+    public final static String TOPIC_PREFIX_PROPERTY = ".topic.prefix";
 
 
     public static Map<String, Object> initConsumerConfigs(ConfigurableEnvironment environment) {
@@ -63,9 +62,17 @@ public class MessagePropertysConfiguration {
     private static List<String> getBootServerList(ConfigurableEnvironment environment) {
 
         String property = environment.getProperty(PROPERTY_NAME_BOOT_SERVER);
-        if (!StringUtils.hasText(property)) {
-            return null;
+        if (StringUtils.hasText(property)) {
+            return getServerList(property);
         }
+        property = environment.getProperty(KAFKA_CONFIG_PROPERTIES);
+        if (StringUtils.hasText(property)) {
+            return getServerList(property);
+        }
+        return null;
+    }
+
+    private static List<String> getServerList(String property) {
         String[] split = StringUtils.split(property, ",");
         return Arrays.asList(split);
     }
