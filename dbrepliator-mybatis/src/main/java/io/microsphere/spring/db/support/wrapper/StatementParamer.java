@@ -13,7 +13,6 @@ public class StatementParamer implements Serializable {
     }
 
     public StatementParamer() {
-        System.out.println("ddddddddddddddddd");
     }
 
     public String getStatement() {
