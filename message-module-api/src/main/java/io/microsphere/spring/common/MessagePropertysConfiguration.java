@@ -27,7 +27,7 @@ public class MessagePropertysConfiguration {
     public final static String PRODUCER_TOPIC_CONFIG_DOMAIN_PROPERTIES = PRODUCER_PROPERTY_NAME_PREFIX + "domain.";
     public final static String CONSUMER_TOPIC_CONFIG_DOMAIN_PROPERTIES = CONSUMER_PROPERTY_NAME_PREFIX + "domain.";
     public final static String CONSUMER_TOPIC_CONFIG_DOMAINS = CONSUMER_PROPERTY_NAME_PREFIX + "domains.";
-    public final static String PRODUCER_TOPIC_CONFIG_DOMAINS = CONSUMER_PROPERTY_NAME_PREFIX + "domains.";
+    public final static String PRODUCER_TOPIC_CONFIG_DOMAINS = PRODUCER_PROPERTY_NAME_PREFIX + "domains.";
     public final static String PARTION_PROPERTY = "partion";
     public final static String GROUP_PROPERTY = "group";
     public final static String MESSAGEHANDLER_BEAN_NAME_PROPERTY = "messagehander";

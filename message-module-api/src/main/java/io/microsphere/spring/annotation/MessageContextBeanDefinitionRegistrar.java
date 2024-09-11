@@ -39,7 +39,6 @@ public class MessageContextBeanDefinitionRegistrar implements ImportBeanDefiniti
     public void registerBeanDefinitions(BeanDefinitionRegistry registry) {
         String kafkaServerList = environment.getProperty(KAFKA_CONFIG_PROPERTIES);
         if (StringUtils.hasText(kafkaServerList)) {
-            registry.registerBeanDefinition(KAFKAMESSAGEBINDER_BEAN_NAME, new RootBeanDefinition(KafkaMessageBinder.class));
             registerBeanDefinition(registry, CONFIGBUILDER_BEAN_NAME, KafkaConfigBuilder.class, environment);
             registerBeanDefinition(registry, DEFAULTMESSAGETARGETFACTORY, DefaultMessageTargetFactory.class);
             registerBeanDefinition(registry, DBREPLMESSAGEBINDER, KafkaMessageBinder.class,DEFAULTMESSAGETARGETFACTORY );
