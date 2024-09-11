@@ -1,6 +1,5 @@
 package io.microsphere.spring.kafka.config;
 
-import io.microsphere.spring.common.MessagePropertysConfiguration;
 import io.microsphere.spring.common.binds.config.ConfigBuilder;
 import io.microsphere.spring.common.binds.config.ConsumerDestination;
 import io.microsphere.spring.common.binds.config.ProducerDestination;

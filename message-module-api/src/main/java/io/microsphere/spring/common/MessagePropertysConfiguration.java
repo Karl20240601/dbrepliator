@@ -1,6 +1,5 @@
 package io.microsphere.spring.common;
 
-import io.microsphere.spring.util.PropertySourcesUtils;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.util.StringUtils;
 
