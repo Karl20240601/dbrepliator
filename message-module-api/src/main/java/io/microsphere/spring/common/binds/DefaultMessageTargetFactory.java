@@ -11,6 +11,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.core.env.Environment;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.SubscribableChannel;
@@ -18,15 +20,16 @@ import org.springframework.messaging.SubscribableChannel;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class DefaultMessageTargetFactory implements MessageTargetFactory, InitializingBean, ApplicationContextAware, MessageTargetRegistry {
+public class DefaultMessageTargetFactory implements MessageTargetFactory, InitializingBean, ApplicationContextAware, MessageTargetRegistry, EnvironmentAware {
     private final Map<String, SubscribableChannel> inputMap = new ConcurrentHashMap<>();
     private final Map<String, ProducerMessageChannel> outputMap = new ConcurrentHashMap<>();
     private final Map<String, ConsumerDestination> consumerDestinationMap = new ConcurrentHashMap<>();
     private final Map<String, ProducerDestination> producerDestinationMap = new ConcurrentHashMap<>();
     private final List<ConsumerDestination> consumerDestinationList = new ArrayList<>();
-    private final List<ProducerDestination> producerDestination = new ArrayList<>();
+    private final List<ProducerDestination> producerDestinationList = new ArrayList<>();
 
     private ApplicationContext applicationContext;
+    private Environment environment;
 
     @Override
     public SubscribableChannel createInput(String inputName, String group, MessageHandler... messageHandlers) {
@@ -65,8 +68,8 @@ public class DefaultMessageTargetFactory implements MessageTargetFactory, Initia
             }
         });
 
-        producerDestination.forEach(producerDestination -> producerDestinationMap.put(producerDestination.getDestinationName(), producerDestination));
-        producerDestination.forEach(producerDestination -> {
+        producerDestinationList.forEach(producerDestination -> producerDestinationMap.put(producerDestination.getDestinationName(), producerDestination));
+        producerDestinationList.forEach(producerDestination -> {
             createOutput(producerDestination.getDestinationName());
         });
     }
@@ -83,7 +86,19 @@ public class DefaultMessageTargetFactory implements MessageTargetFactory, Initia
 
     @Override
     public ConsumerDestination getConsumerDestination(String inputName) {
-        return null;
+        return consumerDestinationMap.get(inputName);
+    }
+
+    @Override
+    public List<ConsumerDestination> getConsumerDestinations() {
+        ArrayList<ConsumerDestination> consumerDestinations = new ArrayList<>(this.consumerDestinationList);
+        return consumerDestinations;
+    }
+
+    @Override
+    public List<ProducerDestination> getProducerDestinations() {
+        ArrayList arrayList = new ArrayList<>(this.producerDestinationList);
+        return arrayList;
     }
 
     @Override
@@ -93,8 +108,12 @@ public class DefaultMessageTargetFactory implements MessageTargetFactory, Initia
 
     @Override
     public ProducerDestination getProducerDestination(String outputName) {
-        return null;
+        return producerDestinationMap.get(outputName);
     }
 
 
+    @Override
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
+    }
 }
