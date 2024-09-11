@@ -19,14 +19,11 @@ public class MessagePropertysConfiguration {
     public static final String PROPERTY_NAME_BOOT_SERVER = PROPERTY_NAME_PREFIX + ".bootstrap.servers";
     public static final String PRODUCER_PROPERTY_NAME_PREFIX = PROPERTY_NAME_PREFIX + "producer.";
     public static final String CONSUMER_PROPERTY_NAME_PREFIX = PROPERTY_NAME_PREFIX + "consumer.";
-    public static final String PRODUCER_PROPERTY_ENABLE = PRODUCER_PROPERTY_NAME_PREFIX + "enable";
-    public static final String CONSUMER_PROPERTY_ENABLE = CONSUMER_PROPERTY_NAME_PREFIX + "enable";
+
     public final static String KAFKA_CONFIG_PROPERTIES = "spring.kafka.bootstrap-servers";
     public final static String RABBITMQ_CONFIG_PROPERTIES = "spring.kafka.bootstrap-servers";
     public final static String TOPIC_CONFIG_PROPERTIES = "spring.kafka.bootstrap-servers";
-    public final static String PRODUCER_TOPIC_CONFIG_DOMAIN_PROPERTIES = PRODUCER_PROPERTY_NAME_PREFIX + "domain.";
     public final static String CONSUMER_TOPIC_CONFIG_DOMAIN_PROPERTIES = CONSUMER_PROPERTY_NAME_PREFIX + "domain.";
-    public final static String CONSUMER_TOPIC_CONFIG_DOMAINS = CONSUMER_PROPERTY_NAME_PREFIX + "domains.";
     public final static String PRODUCER_TOPIC_CONFIG_DOMAINS = PRODUCER_PROPERTY_NAME_PREFIX + "domains.";
     public final static String PARTION_PROPERTY = "partion";
     public final static String GROUP_PROPERTY = "group";

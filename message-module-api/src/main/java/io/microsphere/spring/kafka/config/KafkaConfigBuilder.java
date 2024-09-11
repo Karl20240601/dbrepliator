@@ -22,7 +22,7 @@ public class KafkaConfigBuilder implements ConfigBuilder {
 
     public KafkaConfigBuilder(Environment environment) {
         this.environment = environment;
-        List<String> propertys = this.environment.getProperty(CONSUMER_TOPIC_CONFIG_DOMAINS, List.class, Collections.emptyList());
+        List<String> propertys = this.environment.getProperty(CONSUMER_TOPIC_CONFIG_DOMAIN_PROPERTIES, List.class, Collections.emptyList());
         this.consumberDomains = propertys;
         List<String> producertDomains = this.environment.getProperty(PRODUCER_TOPIC_CONFIG_DOMAINS, List.class, Collections.emptyList());
         this.producertDomains = producertDomains;
