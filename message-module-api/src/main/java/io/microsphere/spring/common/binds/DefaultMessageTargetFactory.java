@@ -1,6 +1,7 @@
 package io.microsphere.spring.common.binds;
 
 
+import io.microsphere.spring.common.binds.config.ConfigBuilder;
 import io.microsphere.spring.common.binds.config.ConsumerDestination;
 import io.microsphere.spring.common.binds.config.ProducerDestination;
 import io.microsphere.spring.common.comsumber.DefaultDispatcher;
@@ -9,6 +10,7 @@ import io.microsphere.spring.common.comsumber.MessageReplSubscribableChannel;
 import io.microsphere.spring.common.producer.ProducerMessageChannel;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.EnvironmentAware;
@@ -30,6 +32,12 @@ public class DefaultMessageTargetFactory implements MessageTargetFactory, Initia
 
     private ApplicationContext applicationContext;
     private Environment environment;
+
+    @Autowired
+    private ConfigBuilder kafkaConfigBuilder;
+
+
+
 
     @Override
     public SubscribableChannel createInput(String inputName, String group, MessageHandler... messageHandlers) {
@@ -58,6 +66,11 @@ public class DefaultMessageTargetFactory implements MessageTargetFactory, Initia
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        List<ConsumerDestination> consumerDestinations = kafkaConfigBuilder.buildConsumerDestination();
+        List<ProducerDestination> producerDestinations = kafkaConfigBuilder.buildProducerDestination();
+        this.consumerDestinationList.addAll(consumerDestinations);
+        this.producerDestinationList.addAll(producerDestinations);
+
         consumerDestinationList.forEach(consumerDestination -> consumerDestinationMap.put(consumerDestination.getDestinationName(), consumerDestination));
         consumerDestinationList.forEach(consumerDestination -> {
             List<String> messageHandlerBeanNames = consumerDestination.getMessageHandlerBeanNames();
@@ -115,5 +128,9 @@ public class DefaultMessageTargetFactory implements MessageTargetFactory, Initia
     @Override
     public void setEnvironment(Environment environment) {
         this.environment = environment;
+    }
+
+    public void setKafkaConfigBuilder(ConfigBuilder kafkaConfigBuilder) {
+        this.kafkaConfigBuilder = kafkaConfigBuilder;
     }
 }

@@ -53,6 +53,17 @@ public class ReplMessageMannger implements SmartLifecycle {
 
     @Override
     public void stop() {
+        consumerEndpointList.forEach(e->{
+            if (e instanceof SmartLifecycle) {
+                ((SmartLifecycle) e).stop();
+            }
+        });
+
+        producerMessageChannelList.forEach(e->{
+            if (e instanceof SmartLifecycle) {
+                ((SmartLifecycle) e).stop();
+            }
+        });
 
     }
 
