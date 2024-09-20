@@ -5,12 +5,10 @@ import java.util.Map;
 
 public abstract class AbstractProducerDestination implements ProducerDestination{
     private  String destinationName;
+    private  String applicationName;
+    private  String topicPrefix;
     private Map<String,Object> configMap;
 
-    public AbstractProducerDestination(String destinationName, Map<String, Object> configMap) {
-        this.destinationName = destinationName;
-        this.configMap = configMap;
-    }
 
     @Override
     public String getDestinationName() {
@@ -29,5 +27,23 @@ public abstract class AbstractProducerDestination implements ProducerDestination
 
     public void setDestinationName(String destinationName) {
         this.destinationName = destinationName;
+    }
+
+    public void setApplicationName(String applicationName) {
+        this.applicationName = applicationName;
+    }
+
+    public void setTopicPrefix(String topicPrefix) {
+        this.topicPrefix = topicPrefix;
+    }
+
+    @Override
+    public String getApplicationName() {
+        return this.applicationName;
+    }
+
+    @Override
+    public String getTopicPrefix() {
+        return this.topicPrefix;
     }
 }

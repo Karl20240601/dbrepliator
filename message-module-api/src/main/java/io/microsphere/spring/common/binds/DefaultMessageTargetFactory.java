@@ -21,10 +21,12 @@ import org.springframework.messaging.SubscribableChannel;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class DefaultMessageTargetFactory implements MessageTargetFactory, InitializingBean, ApplicationContextAware, MessageTargetRegistry, EnvironmentAware {
     private final Map<String, SubscribableChannel> inputMap = new ConcurrentHashMap<>();
     private final Map<String, ProducerMessageChannel> outputMap = new ConcurrentHashMap<>();
+    private final Map<String, List<MessageChannel>> applicationMap = new ConcurrentHashMap<>();
     private final Map<String, ConsumerDestination> consumerDestinationMap = new ConcurrentHashMap<>();
     private final Map<String, ProducerDestination> producerDestinationMap = new ConcurrentHashMap<>();
     private final List<ConsumerDestination> consumerDestinationList = new ArrayList<>();
@@ -35,8 +37,6 @@ public class DefaultMessageTargetFactory implements MessageTargetFactory, Initia
 
     @Autowired
     private ConfigBuilder kafkaConfigBuilder;
-
-
 
 
     @Override
@@ -83,8 +83,11 @@ public class DefaultMessageTargetFactory implements MessageTargetFactory, Initia
 
         producerDestinationList.forEach(producerDestination -> producerDestinationMap.put(producerDestination.getDestinationName(), producerDestination));
         producerDestinationList.forEach(producerDestination -> {
-            createOutput(producerDestination.getDestinationName());
+            MessageChannel output = createOutput(producerDestination.getDestinationName());
+            List<MessageChannel> producerMessageChannels = applicationMap.getOrDefault(producerDestination.getApplicationName(), Collections.emptyList());
+            producerMessageChannels.add(output);
         });
+
     }
 
     @Override
