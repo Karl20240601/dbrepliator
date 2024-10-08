@@ -1,0 +1,22 @@
+server:
+  port: 7790
+
+
+spring:
+  application:
+    name: springcloud-gateway
+  profiles:
+    active: dev
+  cloud:
+    config:
+      enabled: false
+    nacos:
+      discovery:
+        namespace: 524ba13d-8e00-45a2-97bd-b2146d3f653d
+        server-addr: ${Push_Center_Nacos:cdh1:8848}
+      config:
+        server-addr: ${Push_Center_Nacos:cdh1:8848}
+        prefix: springcloud-gateway
+        group: DEFAULT_GROUP
+        file-extension: yml
+        namespace: 524ba13d-8e00-45a2-97bd-b2146d3f653d

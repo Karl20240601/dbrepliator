@@ -1,0 +1,183 @@
+spring:
+  jpa:
+    properties:
+      hibernate:
+        #        dialect: org.hibernate.dialect.MySQL5Dialect
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+    #        dialect: org.hibernate.dialect.Oracle10gDialect
+    show-sql: true
+    #        hbm2ddl:
+    #          auto: update
+  redis:
+    blockWhenExhausted: true  # 链接耗尽时是否阻塞
+    database: 0  # 指定redis数据库
+    host: cdh1  # redis主机IP
+    maxIdle: 100   # 最大空闲连接数
+    maxTotal: 2000  # 最大连接数
+    maxWaitMillis: 60000  # 获取链接最大等待毫秒
+    minEvictableIdleTimeMillis: 1800000  # 最小空闲时间
+    numTestsPerEvictionRun: 1024  # 每次释放链接的最大数目
+    password: 123456  # 密码 如果你没有设置密码 这个配置可以不设置
+    #password:  # 密码 如果你没有设置密码 这个配置可以不设置
+    port: 6379  # redis端口
+    softMinEvictableIdleTimeMillis: 10000  # 链接空闲多久后释放
+    testOnBorrow: false  # 在使用时监测有效性
+    testWhileIdle: true  # 获取链接时检查有效性
+    timeBetweenEvictionRunsMillis: 30000  # 释放链接的扫描间隔（毫秒）
+    connTimeout: 6000  # 链接超时 ms
+    readTimeout: 6000  # 链接超时 ms
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.web.servlet.MultipartAutoConfiguration
+  http:
+    encoding:
+      charset: utf-8
+      enabled: true
+      force: true
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  server:
+    tomcat:
+      uri-encoding: UTF-8
+      max-threads: 800
+      accept-count: 1000
+      max-connections: 5000
+      min-spare-threads: 20
+  servlet:
+    multipart:
+      max-file-size: '100Mb'
+      max-request-size: '100Mb'
+  cloud:
+    sentinel:
+      transport:
+        dashboard: cdh1:8849 #配置Sentinel dashboard地址
+        port: 8719   #这里配置的是本地端口
+      eager: true
+    inetutils:
+      timeout-seconds: 10
+      preferred-networks: ${SCAFFOLD_PREFERRED_NETWORKS:192.168.68.}
+      prefer-ip-address: true  #访问路径可以显示IP地址
+
+distribute:
+  redis:
+    lock:
+      sha1: f5470077ed41358fb58a8178d9642136d98e3f2c
+    unlock:
+      sha1: 9b1129fae0be6498d3ceeebc241b39c4f23c5bf6
+    rateLimit:
+      sha1: 1471abe33b73530f0b9ee7e277633a93884652c4
+    seckillSucess:
+      sha1: a08d0934430138bde52a12c69b582f5ddc80ba6a
+    seckillFailed:
+      sha1: 6b4fc4a0cf2de42df1ad41f73345448625c9965b
+    seckillQueue:
+      sha1: d0ed806466edb879d785351658c2ec8eb82b426c
+
+
+ribbon:
+  eager-load:
+    enabled: true # 开启Ribbon的饥饿加载模式，启动时创建 RibbonClient
+  MaxAutoRetries: 1 # 同一台实例的最大重试次数，但是不包括首次调用，默认为1次
+  MaxAutoRetriesNextServer: 2  # 重试负载均衡其他实例的最大重试次数，不包括首次调用，默认为0次
+  OkToRetryOnAllOperations: true  # 是否对所有操作都重试，默认false
+  ServerListRefreshInterval: 2000 # 从注册中心刷新服务器列表信息的时间间隔，默认为2000毫秒，即2秒
+  retryableStatusCodes: 400,401,403,404,500,502,504
+  NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RetryRule #配置规则 重试
+  ConnectTimeout: 3000  #连接建立的超时时长，默认1秒
+  ReadTimeout: 3000 #处理请求的超时时间，默认为1秒
+  MaxTotalConnections: 1000  # 最大连接数
+  MaxConnectionsPerHost: 1000  # 每个host最大连接数
+  restclient:
+    enabled: true
+
+
+hystrix:
+  threadpool:
+    default:
+      coreSize: 10 # 线程池核心线程数
+      maximumSize: 20  # 线程池最大线程数
+      allowMaximumSizeToDivergeFromCoreSize: true   # 线程池最大线程数是否有效
+      keepAliveTimeMinutes: 10  # 设置可空闲时间，单位分钟
+    demo-provider:
+      coreSize: 20   # 线程池核心线程数
+      maximumSize: 100   # 线程池最大线程数
+      allowMaximumSizeToDivergeFromCoreSize: true   # 线程池最大线程数是否有效
+      keepAliveTimeMinutes: 20  # 设置可空闲时间，单位分钟
+  propagate:
+    request-attribute:
+      enabled: true
+  command:
+    default: #全局默认配置
+      execution: #线程隔离相关配置
+        timeout:
+          enabled: true   #是否给方法执行设置超时时间，默认为true。一般我们不要改。
+        isolation:
+          strategy: THREAD    #配置请求隔离的方式，这里是默认的线程池方式。还有一种信号量的方式semaphore，使用比较少。
+          thread:
+            timeoutInMilliseconds: 100000  #方式执行的超时时间，默认为1000毫秒，在实际场景中需要根据情况设置
+            interruptOnTimeout: true   #发生超时时是否中断方法的执行，默认值为true。不要改。
+            interruptOnCancel: false  #是否在方法执行被取消时中断方法，默认值为false。没有实际意义，默认就好！
+      circuitBreaker: #熔断器相关配置
+        enabled: true   #是否启动熔断器，默认为true，false表示不要引入 Hystrix。
+        requestVolumeThreshold: 20     #启用熔断器功能窗口时间内的最小请求数，假设我们设置的窗口时间为10秒，
+        sleepWindowInMilliseconds: 5000    #此配置的作用是指定熔断器打开后多长时间内允许一次请求尝试执行，官方默认配置为5秒。
+        errorThresholdPercentage: 50   #窗口时间内超过50%的请求失败后就会打开熔断器将后续请求快速失败掉,默认配置为50
+      metrics:
+        rollingStats:
+          timeInMilliseconds: 10000
+          numBuckets: 10
+
+# 暴露监控端点
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+
+tunnel:
+  websocket:
+    port: 9999
+
+ogging:
+  config: classpath:logback.xml
+multipart:
+  maxFileSize: 128KB
+  maxRequestSize: 128KBc
+  uploadTempDir: /work/upload/
+
+zookeeper:
+  address: cdh1:2181
+
+
+
+rsa:
+  key:
+    #    publicKeyFile: /work/rsa-key/id_key_rsa.pub
+    #    privateKeyFile:  /work/rsa-key/id_key_rsa
+    publicKeyFile: D:/dev/push-mid-platform/message-push-platform/rsa-key/id_key_rsa.pub
+    privateKeyFile: D:/dev/push-mid-platform/message-push-platform/rsa-key/id_key_rsa
+
+  #rocketmq服务地址和相关配置
+rocketmq:
+  nameServer: cdh1:9876
+  consumer:
+    group: push-consumer #自定义的组名称
+    relayGroup: push-consumer-relay #自定义的组名称
+  producer:
+    relayGroup: push-producer-relay #自定义的组名称
+    relayTopic: push-msg-relay
+    group: push-producer #自定义的组名称
+    topic: push-msg
+    send-message-timeout: 3000  #消息发送超时时长
+    concurrent: 2
+    retryTimes: 3
+    maxWaited: 100000
+
+
+websocket:
+  register:
+    gateway: cdh1:8000

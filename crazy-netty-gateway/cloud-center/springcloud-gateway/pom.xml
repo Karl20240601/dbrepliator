@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>cloud-center</artifactId>
+        <groupId>com.crazymaker.gateway</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.crazymaker.gateway</groupId>
+    <artifactId>springcloud-gateway</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>springcloud-gateway</name>
+    <packaging>jar</packaging>
+    <properties>
+        <target_path>D:/virtual/workcluster/sit-ware/${project.artifactId}</target_path>
+        <target_file>${project.artifactId}-${project.version}.jar</target_file>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.crazymaker.gateway</groupId>
+            <artifactId>tinyid-starter</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>spring-boot-starter-web</artifactId>
+                    <groupId>org.springframework.boot</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>druid-spring-boot-starter</artifactId>
+                    <groupId>com.alibaba</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                    <groupId>org.springframework.boot</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-web</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-webmvc</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <artifactId>zookeeper-starter</artifactId>
+            <groupId>com.crazymaker.gateway</groupId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <!--gateway 网关依赖,内置webflux 依赖 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
+        </dependency>
+        <!--新增sentinel-->
+        <dependency>
+            <groupId>com.alibaba.csp</groupId>
+            <artifactId>sentinel-spring-cloud-gateway-adapter</artifactId>
+        </dependency>
+        <!--    <dependency>
+               <groupId>com.alibaba.csp</groupId>
+               <artifactId>sentinel-transport-simple-http</artifactId>
+           </dependency>-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+        </dependency>
+        <!--       <dependency>
+                   <groupId>com.alibaba.cloud</groupId>
+                   <artifactId>spring-cloud-alibaba-sentinel</artifactId>
+               </dependency>-->
+        <!-- nacos服务注册发现依赖-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql.connector.version}</version>
+        </dependency>
+        <!-- nacos配置服务依赖-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>${hutool.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>swagger-bootstrap-ui</artifactId>
+            <version>${swagger-ui.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-common</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.crazymaker.gateway</groupId>
+            <artifactId>base-common</artifactId>
+            <version>${env.version}</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.crazymaker.gateway</groupId>
+            <artifactId>auth-starter</artifactId>
+            <version>${env.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-web</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-webmvc</artifactId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>base-runtime</artifactId>
+                    <groupId>com.crazymaker.gateway</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-client</artifactId>
+            <version>${rocketmq-client.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-commons</artifactId>
+        </dependency>
+
+        <dependency>
+            <artifactId>zookeeper-starter</artifactId>
+            <groupId>com.crazymaker.gateway</groupId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <!--        linux 找不到包后新增-->
+        <!-- <dependency>
+             <groupId>javax.servlet</groupId>
+             <artifactId>javax.servlet-api</artifactId>
+             <version>4.0.1</version>
+         </dependency>
+         <dependency>
+             <groupId>org.springframework</groupId>
+             <artifactId>spring-webmvc</artifactId>
+             <version>5.1.13.RELEASE</version>
+         </dependency>-->
+        <!-- httpClient依赖,缺少此依赖api网关转发请求时可能发生503错误 -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.crazymaker.tinyid</groupId>
+            <artifactId>tinyid-client</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+        </dependency>
+        <!--
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-web</artifactId>
+
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.springframework</groupId>
+                            <artifactId>spring-webmvc</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-starter-tomcat</artifactId>
+                        </exclusion>
+                    </exclusions>
+
+                </dependency>
+        -->
+
+        <!--   <dependency>
+               <groupId>org.springframework.security</groupId>
+               <artifactId>spring-security-config</artifactId>
+               <version>5.1.7.RELEASE</version>
+           </dependency>
+           <dependency>
+               <groupId>org.springframework.security</groupId>
+               <artifactId>spring-security-web</artifactId>
+               <version>5.1.7.RELEASE</version>
+           </dependency>-->
+    </dependencies>
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.crazymaker.cloud.nacos.demo.gateway.starter.GatewayProviderApplication</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4.1</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/assembly.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <id>deploy</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <delete file="${target_path}/${target_file}"></delete>
+                                <copy file="target/${target_file}" todir="${target_path}/"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            <!--
+
+                                   &lt;!&ndash; 添加docker-maven插件 &ndash;&gt;
+
+                                   <plugin>
+                                       <groupId>com.spotify</groupId>
+                                       <artifactId>docker-maven-plugin</artifactId>
+                                       <version>1.1.1</version>
+                                       <configuration>
+                                           <imageName>dockerlocal:5000/${project.artifactId}:${project.version}</imageName>
+                                           <baseImage>dockerlocal:5000/java</baseImage>
+                                           <entryPoint>["java", "-jar", "/${project.build.finalName}.jar"]</entryPoint>
+                                           <dockerDirectory>docker</dockerDirectory>
+                                           <resources>
+                                               <resource>
+                                                   <targetPath>/</targetPath>
+                                                   <directory>${project.build.directory}</directory>
+                                                   <include>${project.build.finalName}.jar</include>
+                                               </resource>
+                                           </resources>
+                                       </configuration>
+                                   </plugin>
+                       -->
+
+        </plugins>
+    </build>
+</project>

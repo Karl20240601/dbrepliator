@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.crazymaker.springcloud.base.config.CustomedRedisHttpSessionConfiguration,\
+  com.crazymaker.springcloud.base.config.RedisSessionFilterConfig

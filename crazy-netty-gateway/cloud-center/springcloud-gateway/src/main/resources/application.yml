@@ -1,0 +1,64 @@
+logging:
+  config: classpath:logback-spring.xml
+  level:
+    root: ${LOG_LEVEL:INFO}
+    com.test.demo: info
+  #  方便Spring Boot Admin页面上实时查看日志
+#  file: ${LOG_PATH:E:/LOG_PATH/logs}/output.log
+spring:
+  cloud:
+    gateway:
+      enabled: true
+      discovery:
+        locator:
+          enabled: true  #开启从注册中心动态创建路由的功能，利用微服务名进行路由
+          lower-case-service-id: true
+          filters:
+            - args[name]: serviceId
+              name: Hystrix
+          predicates:
+            - args[pattern]: '"''/''+serviceId+''/**''"'
+              name: Path
+      routes:
+        - id: message-auth-provider-route
+          uri: lb://message-auth-provider
+          predicates:
+            - Path=/message-auth-provider/**
+        - id: message-dispatcher-provider-route
+          uri: lb://message-dispatcher-provider
+          predicates:
+            - Path=/message-dispatcher-provider/**
+        - id: blog
+          uri: https://blog.csdn.net/
+          predicates:
+            - Path=/csdn
+        - id: blog1
+          uri: https://blog.csdn.net/
+          predicates:
+            - Path=/blog1/**
+          filters:
+            - RewritePath=/blog1/(?<segment>.*), /$\{segment}
+        # 代理前  http://192.168.68.1:9999/blog1/crazymakercircle/article/details/80208650
+        #  代理后  https://blog.csdn.net/crazymakercircle/article/details/80208650
+        - id: service_provider_demo_route
+          uri: lb://service-provider-demo
+          predicates:
+            - Path=/provider/**
+        - id: service_provider_demo_route_filter
+          uri: lb://service-provider-demo
+          predicates:
+            - Path=/filter/**
+          filters:
+            - RewritePath=/filter/(?<segment>.*), /provider/$\{segment}
+        - id: service_consumer_demo_route
+          uri: lb://service-consumer-demo
+          predicates:
+            - Path=/consumer/**
+        - id: sentinel_demo_provider_route
+          uri: lb://sentinel-demo-provider
+          predicates:
+            - Path=/sentinel-demo/**
+        - id: uaa-provider_route
+          uri: lb://uaa-provider
+          predicates:
+            - Path=/uaa-provider/**

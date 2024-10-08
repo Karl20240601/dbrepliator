@@ -1,0 +1,4 @@
+com.crazymaker.gateway.filter.http.AsyncHttpSimpleRouterFilter
+com.crazymaker.gateway.filter.common.ResponseWriteFilter
+com.crazymaker.gateway.filter.common.ServiceBalanceFilter
+com.crazymaker.gateway.filter.common.ErrorWriteFilter

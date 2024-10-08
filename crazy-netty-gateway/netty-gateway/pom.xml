@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.crazymaker.gateway</groupId>
+        <artifactId>crazy-netty-gateway</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>netty-gateway</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <modules>
+        <!--路由规则加载模块： 从文件加载规则，从DB加载规则， 从缓存加载规则-->
+        <module>rule-loader-simple</module>
+        <!--路由处理模块： 对下游的请求，根据路由规则进行过滤器责任链处理，转发到上游并把上游结果 返回给下游-->
+        <module>netty-process-simple</module>
+        <!--过滤器责任链模块，针对每一个路由规则对应一组责任链，利用工厂模式，对路由规则的责任链进行动态创建 -->
+        <module>filter-chain-simple</module>
+        <!--netty api网关接口模块，定义了核心的领域模型， 包括filter领域模型、metadata 领域模型、Context上下文领域模型、Request/Response请求响应数据领域模型-->
+        <!-- 所有模块要依赖的公共、基础模块，所有模块都用到这些核心领域模型-->
+        <module>gateway-core-api</module>
+
+        <!-- Netty 高性能IO框架的 装配模块，接受TCP连接、IO请求，并且完成IO数据传输-->
+        <module>gateway-bootstrap</module>
+
+        <!-- 定义可拔插过滤器的：负载均衡过滤器、 错误处理过滤器、结果处理过滤 、http转发过滤器、 鉴权过滤、限流过滤器-->
+        <module>filter-def-lib</module>
+        <!-- 定义可拔插负载均衡策略的：roundrobin 、随机-->
+
+       <module>balance-def-lib</module>
+       <module>register-centor-nacos</module>
+
+   </modules>
+
+</project>

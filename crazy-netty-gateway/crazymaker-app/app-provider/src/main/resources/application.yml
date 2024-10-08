@@ -1,0 +1,15 @@
+server:
+  servlet:
+    context-path: /message-auth-provider
+  port: 7702
+#zipkin:
+#  rabbitmq:
+#    queue: zipkin
+
+logging:
+  config: classpath:logback-spring.xml
+  level:
+    root: ${LOG_LEVEL:INFO}
+    com.test.demo: info
+  #  方便Spring Boot Admin页面上实时查看日志
+#  file: $PATH:E:/LOG_PATH/logs}/output.log{LOG_

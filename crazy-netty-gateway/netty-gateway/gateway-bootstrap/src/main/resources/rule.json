@@ -1,0 +1,12 @@
+{
+  "rules": [
+    {
+      "id": 1,
+      "serviceId": "ping",
+      "upstreamPath": "http://localhost:18083/config/simple/ping",
+      "protocol": "http",
+      "prefix": "/ping"
+    }
+  ]
+}
+
